@@ -1,0 +1,14 @@
+# Default 
+.gradle
+/local.properties
+
+# Idea, User Specific
+.idea/workspace.xml
+.idea/tasks.xml
+.idea/dataSources.ids
+.idea/dataSources.xml
+.idea/sqlDataSources.xml
+.idea/dynamic.xml
+out
+
+.DS_Store
