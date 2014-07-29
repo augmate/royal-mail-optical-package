@@ -1,1 +1,1 @@
-include ':ups', ':scanner'
+include ':ups', ':AugmateSDK:scanner'
