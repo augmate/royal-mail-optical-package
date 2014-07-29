@@ -6,6 +6,7 @@
       <module fileurl="file://$PROJECT_DIR$/cycle-counting.iml" filepath="$PROJECT_DIR$/cycle-counting.iml" />
       <module fileurl="file://$PROJECT_DIR$/AugmateSDK/scanner/scanner.iml" filepath="$PROJECT_DIR$/AugmateSDK/scanner/scanner.iml" />
       <module fileurl="file://$PROJECT_DIR$/ups/ups.iml" filepath="$PROJECT_DIR$/ups/ups.iml" />
+      <module fileurl="file://$PROJECT_DIR$/AugmateSDK/voice/voice.iml" filepath="$PROJECT_DIR$/AugmateSDK/voice/voice.iml" />
     </modules>
   </component>
 </project>
