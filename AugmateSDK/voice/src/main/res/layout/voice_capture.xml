@@ -1,19 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:orientation="horizontal"
               android:layout_width="match_parent"
               android:layout_height="match_parent">
-
-    <ImageView
-        android:layout_width="123dp"
-        android:layout_height="186dp"
-        android:id="@+id/imageView"
-        android:src="@drawable/augmate_logo"
-        android:contentDescription="@string/augmate_logo"
-        android:layout_alignParentStart="true"
-        android:layout_alignBottom="@+id/results_field"
-        android:layout_alignEnd="@+id/results_field"/>
 
     <TextView
         android:text="Standby"
@@ -44,4 +34,14 @@
         android:layout_alignBottom="@+id/imageView"
         android:layout_alignParentStart="true"
         android:layout_marginBottom="28dp"/>
-</LinearLayout>
+
+    <ImageView
+        android:layout_width="123dp"
+        android:layout_height="186dp"
+        android:id="@+id/imageView"
+        android:src="@drawable/augmate_logo"
+        android:contentDescription="@string/augmate_logo"
+        android:layout_alignParentStart="true"
+        android:layout_alignBottom="@+id/results_field"
+        android:layout_alignEnd="@+id/results_field"/>
+</RelativeLayout>
