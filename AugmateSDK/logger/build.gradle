@@ -3,7 +3,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:0.10.+'
+        classpath 'com.android.tools.build:gradle:0.9.+'
     }
 }
 apply plugin: 'android-library'
@@ -13,8 +13,8 @@ repositories {
 }
 
 android {
-    compileSdkVersion 19
-    buildToolsVersion "19.1.0"
+    compileSdkVersion "Google Inc.:Glass Development Kit Preview:19"
+    buildToolsVersion "20.0.0"
 
     defaultConfig {
         minSdkVersion 19
@@ -37,5 +37,7 @@ android {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile project(':AugmateSDK:logger')
+    compile 'com.logentries:logentries-appender:1.1.25'
+    compile 'joda-time:joda-time:2.3'
+    compile 'log4j:log4j:1.2.17'
 }

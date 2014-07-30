@@ -9,7 +9,7 @@ import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.widget.TextView;
 import android.widget.Toast;
-
+import com.augmate.sdk.logger.Log;
 
 import java.util.ArrayList;
 
@@ -25,6 +25,8 @@ public class VoiceCaptorPlaceholder extends Activity implements IAudioDoneCallba
         setContentView(R.layout.voice_capture);
         resultsText = (TextView) findViewById(R.id.results_field);
         promptText = (TextView) findViewById(R.id.prompt_field);
+
+        Log.debug("Voice Captor Initiated.");
     }
 
     private void startListening() {
@@ -37,10 +39,15 @@ public class VoiceCaptorPlaceholder extends Activity implements IAudioDoneCallba
                 .putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 5);
 
         speechRecognizer.startListening(recognizerIntent);
+
+        Log.debug("Commencing voice captoring.");
     }
 
     @Override
     public boolean onKeyDown(int keycode, KeyEvent event) {
+
+        Log.debug("Caught key-down on key=" + KeyEvent.keyCodeToString(keycode));
+
         if (keycode == KeyEvent.KEYCODE_DPAD_CENTER) {
             Toast.makeText(getApplicationContext(),
                     "Listening" , Toast.LENGTH_LONG).show();
@@ -57,6 +64,8 @@ public class VoiceCaptorPlaceholder extends Activity implements IAudioDoneCallba
                 "Done" , Toast.LENGTH_LONG).show();
         resultsText.append(TextUtils.join(", ", results) + "\n");
         promptText.setText("Listening");
+        Log.debug("Much listening. Very success.");
+        // TODO: add ArrayList/Dictionary dumper ala Log.dump()
     }
 
     @Override

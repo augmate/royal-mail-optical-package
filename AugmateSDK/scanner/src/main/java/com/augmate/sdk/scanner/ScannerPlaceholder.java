@@ -1,9 +1,9 @@
 package com.augmate.sdk.scanner;
 
-import android.util.Log;
+import com.augmate.sdk.logger.Log;
 
 public class ScannerPlaceholder {
     public ScannerPlaceholder() {
-        Log.d("com.augmate.sdk.scanner", "I'm a little scanner short and stout.");
+        Log.debug("I'm a little scanner short and stout.");
     }
 }
