@@ -39,4 +39,5 @@ dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile project(':AugmateSDK:scanner')
     compile project(':AugmateSDK:voice')
+    compile project(':AugmateSDK:logger')
 }
