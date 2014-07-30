@@ -3,6 +3,7 @@ package com.augmate.sdk.voice;
 import android.os.Bundle;
 import android.speech.RecognitionListener;
 import android.speech.SpeechRecognizer;
+import android.text.TextUtils;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -36,11 +37,13 @@ public class AugmateRecognitionListener implements RecognitionListener{
 
     @Override
     public void onEndOfSpeech() {
+        myCallback.onEnd();
         Log.d(TAG, "on end of speech");
     }
 
     @Override
     public void onError(int error) {
+        myCallback.onError(error);
         Log.d(TAG, "on error: " + error);
     }
 
@@ -52,13 +55,15 @@ public class AugmateRecognitionListener implements RecognitionListener{
         for (String str : stringArrayList) {
             Log.d(TAG, "result=" + str);
         }
-        myCallback.onSuccess(stringArrayList);
+        myCallback.onResults(stringArrayList);
 
     }
 
     @Override
     public void onPartialResults(Bundle partialResults) {
-        Log.d(TAG, "on partial results");
+        ArrayList<String> stringArrayList = partialResults.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
+        myCallback.onPartial(stringArrayList);
+        Log.d(TAG, "on partial results "+ TextUtils.join(", ", stringArrayList));
     }
 
     @Override

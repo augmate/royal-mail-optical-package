@@ -31,7 +31,7 @@ public class VoiceCaptorPlaceholder extends Activity implements IAudioDoneCallba
         resultsText = (TextView) findViewById(R.id.results_field);
         promptText = (TextView) findViewById(R.id.prompt_field);
         image = (ImageView) findViewById(R.id.imageView);
-        animThread = new AnimThread(image,new AnimationUtils().loadAnimation(this, R.anim.pulse));
+        //animThread = new AnimThread(image,new AnimationUtils().loadAnimation(this, R.anim.pulse));
 
         Log.debug("Voice Captor Initiated.");
     }
@@ -54,9 +54,10 @@ public class VoiceCaptorPlaceholder extends Activity implements IAudioDoneCallba
     public boolean onKeyDown(int keycode, KeyEvent event) {
 
         Log.debug("Caught key-down on key=" + KeyEvent.keyCodeToString(keycode));
-        animThread.start();
 
         if (keycode == KeyEvent.KEYCODE_DPAD_CENTER) {
+            image.startAnimation(new AnimationUtils().loadAnimation(this, R.anim.shake));
+            resultsText.setText("");
             Toast.makeText(getApplicationContext(),
                     "Listening" , Toast.LENGTH_LONG).show();
             promptText.setText("Listening");
@@ -67,7 +68,12 @@ public class VoiceCaptorPlaceholder extends Activity implements IAudioDoneCallba
     }
 
     @Override
-    public void onSuccess(ArrayList<String> results){
+    public void onPartial(ArrayList<String> results) {
+        resultsText.setText(TextUtils.join(", ", results) + "\n");
+    }
+
+    @Override
+    public void onResults(ArrayList<String> results){
         Toast.makeText(getApplicationContext(),
                 "Done" , Toast.LENGTH_LONG).show();
         resultsText.setText(TextUtils.join(", ", results) + "\n");
@@ -77,10 +83,18 @@ public class VoiceCaptorPlaceholder extends Activity implements IAudioDoneCallba
     }
 
     @Override
+    public void onEnd() {
+    }
+
+    @Override
+    public void onError(int error) {
+        promptText.setText("Error "+ error + "\nStandby");
+    }
+
+    @Override
     public void onDestroy(){
         if(speechRecognizer!=null)
             speechRecognizer.destroy();
         super.onDestroy();
     }
-
 }
