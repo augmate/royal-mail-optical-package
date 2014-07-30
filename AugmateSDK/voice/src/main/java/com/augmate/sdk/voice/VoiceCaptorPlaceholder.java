@@ -7,6 +7,9 @@ import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
 import android.text.TextUtils;
 import android.view.KeyEvent;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.augmate.sdk.logger.Log;
@@ -18,6 +21,8 @@ public class VoiceCaptorPlaceholder extends Activity implements IAudioDoneCallba
     SpeechRecognizer speechRecognizer = SpeechRecognizer.createSpeechRecognizer(this);
     private TextView promptText;
     private TextView resultsText;
+    private ImageView image;
+    private AnimThread animThread;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,6 +30,8 @@ public class VoiceCaptorPlaceholder extends Activity implements IAudioDoneCallba
         setContentView(R.layout.voice_capture);
         resultsText = (TextView) findViewById(R.id.results_field);
         promptText = (TextView) findViewById(R.id.prompt_field);
+        image = (ImageView) findViewById(R.id.imageView);
+        animThread = new AnimThread(image,new AnimationUtils().loadAnimation(this, R.anim.pulse));
 
         Log.debug("Voice Captor Initiated.");
     }
@@ -47,6 +54,7 @@ public class VoiceCaptorPlaceholder extends Activity implements IAudioDoneCallba
     public boolean onKeyDown(int keycode, KeyEvent event) {
 
         Log.debug("Caught key-down on key=" + KeyEvent.keyCodeToString(keycode));
+        animThread.start();
 
         if (keycode == KeyEvent.KEYCODE_DPAD_CENTER) {
             Toast.makeText(getApplicationContext(),
@@ -62,8 +70,8 @@ public class VoiceCaptorPlaceholder extends Activity implements IAudioDoneCallba
     public void onSuccess(ArrayList<String> results){
         Toast.makeText(getApplicationContext(),
                 "Done" , Toast.LENGTH_LONG).show();
-        resultsText.append(TextUtils.join(", ", results) + "\n");
-        promptText.setText("Listening");
+        resultsText.setText(TextUtils.join(", ", results) + "\n");
+        promptText.setText("Standby");
         Log.debug("Much listening. Very success.");
         // TODO: add ArrayList/Dictionary dumper ala Log.dump()
     }
