@@ -3,5 +3,6 @@
 
     <string name="app_name">voice</string>
     <string name="hello_world">Hello world!</string>
+    <string name="augmate_logo">augmate_logo</string>
 
 </resources>

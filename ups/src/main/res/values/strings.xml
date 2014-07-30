@@ -3,5 +3,6 @@
 
     <string name="app_name">cycle</string>
     <string name="hello_world">Hello world!</string>
+    <string name="augmate_logo">augmate</string>
 
 </resources>
