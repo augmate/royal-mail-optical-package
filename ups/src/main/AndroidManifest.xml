@@ -2,11 +2,15 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.augmate.cycle.ups" >
 
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <!--<uses-permission android:name="android.permission.DEVICE_POWER" />-->
+
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:name=".CycleUpsApplication">
+
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name" >

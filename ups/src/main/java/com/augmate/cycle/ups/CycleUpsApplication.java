@@ -1,6 +1,9 @@
 package com.augmate.cycle.ups;
 
 import android.app.Application;
+import android.content.Context;
+import android.os.PowerManager;
+import android.os.SystemClock;
 import com.augmate.sdk.logger.Log;
 
 public class CycleUpsApplication extends Application {
