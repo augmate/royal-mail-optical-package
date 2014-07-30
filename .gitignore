@@ -1,6 +1,7 @@
 # Default 
 .gradle
 /local.properties
+build
 
 # Idea, User Specific
 .idea/workspace.xml
