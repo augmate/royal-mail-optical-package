@@ -2,6 +2,7 @@ package com.augmate.sdk.voice;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
@@ -21,8 +22,10 @@ public class VoiceCaptorPlaceholder extends Activity implements IAudioDoneCallba
     private TextView promptText;
     private TextView resultsText;
     private ImageView logo;
-    private Animation voiceAnim;
     private ImageView pulse_ring;
+    private Animation voiceAnim;
+
+    private MediaPlayer start_sound, success_sound, error_sound;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,8 +36,9 @@ public class VoiceCaptorPlaceholder extends Activity implements IAudioDoneCallba
         logo = (ImageView) findViewById(R.id.imageView);
         pulse_ring = (ImageView) findViewById(R.id.imageView2);
         voiceAnim = new AnimationUtils().loadAnimation(this, R.anim.grow_then_fade);
-
-        Log.debug("Voice Captor Initiated.");
+        start_sound = MediaPlayer.create(this, R.raw.start_sound);
+        success_sound = MediaPlayer.create(this, R.raw.correct_sound);
+        error_sound = MediaPlayer.create(this, R.raw.wrong_sound);
     }
 
     private void startListening() {
@@ -47,18 +51,17 @@ public class VoiceCaptorPlaceholder extends Activity implements IAudioDoneCallba
                 .putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 5);
 
         speechRecognizer.startListening(recognizerIntent);
-
-        Log.debug("Commencing voice captoring.");
     }
 
     @Override
-    public boolean onKeyDown(int keycode, KeyEvent event) {
+    public boolean onKeyDown(int keycode, @SuppressWarnings("NullableProblems") KeyEvent event) {
 
         Log.debug("Caught key-down on key=" + KeyEvent.keyCodeToString(keycode));
 
         if (keycode == KeyEvent.KEYCODE_DPAD_CENTER) {
             //voiceAnim.setRepeatCount(Animation.INFINITE);
             //voiceAnim.setRepeatMode(Animation.REVERSE);
+            start_sound.start();
             pulse_ring.startAnimation(voiceAnim);
             resultsText.setText("");
             promptText.setText("Listening");
@@ -75,17 +78,19 @@ public class VoiceCaptorPlaceholder extends Activity implements IAudioDoneCallba
 
     @Override
     public void onResults(ArrayList<String> results){
+        success_sound.start();
+        pulse_ring.clearAnimation();
         resultsText.setText(TextUtils.join(", ", results) + "\n");
         promptText.setText("Standby");
     }
 
     @Override
     public void onEnd() {
-        pulse_ring.clearAnimation();
     }
 
     @Override
     public void onError(int error) {
+        error_sound.start();
         pulse_ring.clearAnimation();
         switch (error) {
             case 6:
@@ -94,6 +99,12 @@ public class VoiceCaptorPlaceholder extends Activity implements IAudioDoneCallba
             default:
                 promptText.setText("Error " + error + "\nStandby");
         }
+    }
+
+    @Override
+    public void onPause(){
+        super.onPause();
+        finish();
     }
 
     @Override
