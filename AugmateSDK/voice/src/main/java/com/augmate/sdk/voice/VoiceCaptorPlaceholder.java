@@ -11,7 +11,6 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 import com.augmate.sdk.logger.Log;
 
 import java.util.ArrayList;
@@ -21,8 +20,9 @@ public class VoiceCaptorPlaceholder extends Activity implements IAudioDoneCallba
     SpeechRecognizer speechRecognizer = SpeechRecognizer.createSpeechRecognizer(this);
     private TextView promptText;
     private TextView resultsText;
-    private ImageView image;
-    private AnimThread animThread;
+    private ImageView logo;
+    private Animation voiceAnim;
+    private ImageView pulse_ring;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,8 +30,9 @@ public class VoiceCaptorPlaceholder extends Activity implements IAudioDoneCallba
         setContentView(R.layout.voice_capture);
         resultsText = (TextView) findViewById(R.id.results_field);
         promptText = (TextView) findViewById(R.id.prompt_field);
-        image = (ImageView) findViewById(R.id.imageView);
-        //animThread = new AnimThread(image,new AnimationUtils().loadAnimation(this, R.anim.pulse));
+        logo = (ImageView) findViewById(R.id.imageView);
+        pulse_ring = (ImageView) findViewById(R.id.imageView2);
+        voiceAnim = new AnimationUtils().loadAnimation(this, R.anim.grow_then_fade);
 
         Log.debug("Voice Captor Initiated.");
     }
@@ -56,10 +57,10 @@ public class VoiceCaptorPlaceholder extends Activity implements IAudioDoneCallba
         Log.debug("Caught key-down on key=" + KeyEvent.keyCodeToString(keycode));
 
         if (keycode == KeyEvent.KEYCODE_DPAD_CENTER) {
-            image.startAnimation(new AnimationUtils().loadAnimation(this, R.anim.shake));
+            //voiceAnim.setRepeatCount(Animation.INFINITE);
+            //voiceAnim.setRepeatMode(Animation.REVERSE);
+            pulse_ring.startAnimation(voiceAnim);
             resultsText.setText("");
-            Toast.makeText(getApplicationContext(),
-                    "Listening" , Toast.LENGTH_LONG).show();
             promptText.setText("Listening");
             startListening();
         }
@@ -74,21 +75,25 @@ public class VoiceCaptorPlaceholder extends Activity implements IAudioDoneCallba
 
     @Override
     public void onResults(ArrayList<String> results){
-        Toast.makeText(getApplicationContext(),
-                "Done" , Toast.LENGTH_LONG).show();
         resultsText.setText(TextUtils.join(", ", results) + "\n");
         promptText.setText("Standby");
-        Log.debug("Much listening. Very success.");
-        // TODO: add ArrayList/Dictionary dumper ala Log.dump()
     }
 
     @Override
     public void onEnd() {
+        pulse_ring.clearAnimation();
     }
 
     @Override
     public void onError(int error) {
-        promptText.setText("Error "+ error + "\nStandby");
+        pulse_ring.clearAnimation();
+        switch (error) {
+            case 6:
+                promptText.setText("Error " + error + "\nStandby");
+                break;
+            default:
+                promptText.setText("Error " + error + "\nStandby");
+        }
     }
 
     @Override
