@@ -8,6 +8,8 @@ import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
 import android.text.TextUtils;
 import android.view.KeyEvent;
+import android.view.View;
+import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
@@ -17,7 +19,7 @@ import com.augmate.sdk.logger.Log;
 import java.util.ArrayList;
 
 public class VoiceCaptorPlaceholder extends Activity implements IAudioDoneCallback {
-
+    AugmateRecognitionListener listener;
     SpeechRecognizer speechRecognizer = SpeechRecognizer.createSpeechRecognizer(this);
     private TextView promptText;
     private TextView resultsText;
@@ -26,11 +28,14 @@ public class VoiceCaptorPlaceholder extends Activity implements IAudioDoneCallba
     private Animation voiceAnim;
 
     private MediaPlayer start_sound, success_sound, error_sound;
+    private SliderView mProgress;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         setContentView(R.layout.voice_capture);
+        listener = new AugmateRecognitionListener(this);
         resultsText = (TextView) findViewById(R.id.results_field);
         promptText = (TextView) findViewById(R.id.prompt_field);
         logo = (ImageView) findViewById(R.id.imageView);
@@ -39,10 +44,11 @@ public class VoiceCaptorPlaceholder extends Activity implements IAudioDoneCallba
         start_sound = MediaPlayer.create(this, R.raw.start_sound);
         success_sound = MediaPlayer.create(this, R.raw.correct_sound);
         error_sound = MediaPlayer.create(this, R.raw.wrong_sound);
+        mProgress = (SliderView) findViewById(R.id.indeterm_slider);
+        mProgress.startIndeterminate();
     }
 
     private void startListening() {
-        AugmateRecognitionListener listener = new AugmateRecognitionListener(this);
         speechRecognizer.setRecognitionListener(listener);
 
         Intent recognizerIntent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
@@ -65,6 +71,7 @@ public class VoiceCaptorPlaceholder extends Activity implements IAudioDoneCallba
             pulse_ring.startAnimation(voiceAnim);
             resultsText.setText("");
             promptText.setText("Listening");
+            logo.setImageResource(R.drawable.augmate_logo_blue);
             startListening();
         }
         super.onKeyDown(keycode, event);
@@ -73,28 +80,58 @@ public class VoiceCaptorPlaceholder extends Activity implements IAudioDoneCallba
 
     @Override
     public void onPartial(ArrayList<String> results) {
-        resultsText.setText(TextUtils.join(", ", results) + "\n");
+        resultsText.setText(TextUtils.join(", ", results));
     }
 
     @Override
     public void onResults(ArrayList<String> results){
         success_sound.start();
         pulse_ring.clearAnimation();
-        resultsText.setText(TextUtils.join(", ", results) + "\n");
-        promptText.setText("Standby");
+        logo.setImageResource(R.drawable.augmate_logo);
+        mProgress.setVisibility(View.INVISIBLE);
+        resultsText.setText(TextUtils.join(", ", results));
+        promptText.setText("Ready");
     }
 
     @Override
     public void onEnd() {
+        mProgress.setVisibility(View.VISIBLE);
     }
 
     @Override
     public void onError(int error) {
         error_sound.start();
         pulse_ring.clearAnimation();
+        logo.setImageResource(R.drawable.augmate_logo_red);
+        mProgress.setVisibility(View.INVISIBLE);
+        promptText.setText("Error " + error + "\nTry again?");
         switch (error) {
+            case 1:
+                resultsText.setText("*No network connection available*");
+                break;
+            case 2:
+                resultsText.setText("*No network connection available*");
+                break;
+            case 3:
+                resultsText.setText("*Audio Recording error*");
+                break;
+            case 4:
+                resultsText.setText("*Server error*");
+                break;
+            case 5:
+                resultsText.setText("*Client error*");
+                break;
             case 6:
-                promptText.setText("Error " + error + "\nStandby");
+                resultsText.setText("*I didn't catch that. Please try again.*");
+                break;
+            case 7:
+                resultsText.setText("*No recognition result matched. Please try again.*");
+                break;
+            case 8:
+                resultsText.setText("*Speech recognizer is busy. Please wait then try again.*");
+                break;
+            case 9:
+                resultsText.setText("*Insufficient permissions. You do not have access to this device's audio recorder.*");
                 break;
             default:
                 promptText.setText("Error " + error + "\nStandby");
