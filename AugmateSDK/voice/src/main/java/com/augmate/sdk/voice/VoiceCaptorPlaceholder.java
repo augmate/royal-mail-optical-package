@@ -65,8 +65,6 @@ public class VoiceCaptorPlaceholder extends Activity implements IAudioDoneCallba
         Log.debug("Caught key-down on key=" + KeyEvent.keyCodeToString(keycode));
 
         if (keycode == KeyEvent.KEYCODE_DPAD_CENTER) {
-            //voiceAnim.setRepeatCount(Animation.INFINITE);
-            //voiceAnim.setRepeatMode(Animation.REVERSE);
             start_sound.start();
             pulse_ring.startAnimation(voiceAnim);
             resultsText.setText("");
