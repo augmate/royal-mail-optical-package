@@ -26,6 +26,7 @@ public class VoiceCaptorPlaceholder extends Activity implements IAudioDoneCallba
     private TextView resultsText;
     private ImageView logo;
     private ImageView pulse_ring;
+    private ImageView error_icon;
     private Animation voiceAnim;
 
     private MediaPlayer start_sound, success_sound, error_sound;
@@ -41,6 +42,7 @@ public class VoiceCaptorPlaceholder extends Activity implements IAudioDoneCallba
         promptText = (TextView) findViewById(R.id.prompt_field);
         logo = (ImageView) findViewById(R.id.imageView);
         pulse_ring = (ImageView) findViewById(R.id.imageView2);
+        error_icon = (ImageView) findViewById(R.id.imageView3);
         voiceAnim = new AnimationUtils().loadAnimation(this, R.anim.grow_then_fade);
         start_sound = MediaPlayer.create(this, R.raw.start_sound);
         success_sound = MediaPlayer.create(this, R.raw.correct_sound);
@@ -70,6 +72,7 @@ public class VoiceCaptorPlaceholder extends Activity implements IAudioDoneCallba
             pulse_ring.startAnimation(voiceAnim);
             resultsText.setText("");
             promptText.setText("Listening");
+            error_icon.setVisibility(View.INVISIBLE);
             logo.setImageResource(R.drawable.augmate_logo_blue);
             startListening();
         }
@@ -112,8 +115,9 @@ public class VoiceCaptorPlaceholder extends Activity implements IAudioDoneCallba
         error_sound.start();
         pulse_ring.clearAnimation();
         logo.setImageResource(R.drawable.augmate_logo_red);
+        error_icon.setVisibility(View.VISIBLE);
         mProgress.setVisibility(View.INVISIBLE);
-        promptText.setText("Error " + error + "\nTry again?");
+        promptText.setText("Error " + error + ". Try again?");
         switch (error) {
             case 1:
                 resultsText.setText("*No network connection available*");
@@ -131,7 +135,8 @@ public class VoiceCaptorPlaceholder extends Activity implements IAudioDoneCallba
                 resultsText.setText("*Client error*");
                 break;
             case 6:
-                resultsText.setText("*I didn't catch that.\n Please try again.*");
+                //resultsText.setText("*I didn't catch that. Please try again.*");
+                resultsText.setText("Q didn't catch that. Please try again Qnsufficient permissions You do not have access to this device's audio recorder Insufficient permissions You do not have access to this device's audio recorder Insufficient permissions You do not have access to this device's audio recorder");
                 break;
             case 7:
                 resultsText.setText("*No recognition result matched. Please try again.*");
@@ -143,7 +148,7 @@ public class VoiceCaptorPlaceholder extends Activity implements IAudioDoneCallba
                 resultsText.setText("*Insufficient permissions. You do not have access to this device's audio recorder.*");
                 break;
             default:
-                promptText.setText("Error " + error + "\nStandby");
+                promptText.setText("Unknown error '" + error + "'. Try again?");
         }
     }
 
