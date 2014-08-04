@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.os.Handler;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
 import android.text.TextUtils;
@@ -76,6 +77,14 @@ public class VoiceCaptorPlaceholder extends Activity implements IAudioDoneCallba
         return true;
     }
 
+    final Runnable showLoadingBar = new Runnable()
+    {
+        public void run()
+        {
+            if(!listener.hasResults()) mProgress.setVisibility(View.VISIBLE);
+        }
+    };
+
     @Override
     public void onPartial(ArrayList<String> results) {
         resultsText.setText(TextUtils.join(", ", results));
@@ -93,7 +102,9 @@ public class VoiceCaptorPlaceholder extends Activity implements IAudioDoneCallba
 
     @Override
     public void onEnd() {
-        mProgress.setVisibility(View.VISIBLE);
+        Handler h = new Handler();
+       /* Added a tenth second delay for displaying loading bar. If the connection is strong, there is not need to have the bar show up*/
+        h.postDelayed(showLoadingBar, 100);
     }
 
     @Override
@@ -138,6 +149,9 @@ public class VoiceCaptorPlaceholder extends Activity implements IAudioDoneCallba
 
     @Override
     public void onPause(){
+        start_sound.release();
+        error_sound.release();
+        success_sound.release();
         super.onPause();
         finish();
     }
