@@ -67,7 +67,7 @@ public class VoiceCaptorPlaceholder extends Activity implements IAudioDoneCallba
 
         Log.debug("Caught key-down on key=" + KeyEvent.keyCodeToString(keycode));
 
-        if (keycode == KeyEvent.KEYCODE_DPAD_CENTER && !listener.isListening()) {
+        if (keycode == KeyEvent.KEYCODE_DPAD_CENTER && !listener.isProcessing()) {
             start_sound.start();
             pulse_ring.startAnimation(voiceAnim);
             resultsText.setText("");
@@ -84,7 +84,7 @@ public class VoiceCaptorPlaceholder extends Activity implements IAudioDoneCallba
     {
         public void run()
         {
-            if(!listener.hasResults()) mProgress.setVisibility(View.VISIBLE);
+            if(listener.isProcessing()) mProgress.setVisibility(View.VISIBLE);
         }
     };
 
@@ -107,7 +107,7 @@ public class VoiceCaptorPlaceholder extends Activity implements IAudioDoneCallba
     public void onEnd() {
         Handler h = new Handler();
        /* Added a tenth second delay for displaying loading bar. If the connection is strong, there is not need to have the bar show up*/
-        h.postDelayed(showLoadingBar, 100);
+        h.postDelayed(showLoadingBar, 200);
     }
 
     @Override
@@ -115,9 +115,9 @@ public class VoiceCaptorPlaceholder extends Activity implements IAudioDoneCallba
         error_sound.start();
         pulse_ring.clearAnimation();
         logo.setImageResource(R.drawable.augmate_logo_red);
-        error_icon.setVisibility(View.VISIBLE);
         mProgress.setVisibility(View.INVISIBLE);
         promptText.setText("Error " + error + ". Try again?");
+        error_icon.setVisibility(View.VISIBLE);
         switch (error) {
             case 1:
                 resultsText.setText("*No network connection available*");
@@ -135,8 +135,7 @@ public class VoiceCaptorPlaceholder extends Activity implements IAudioDoneCallba
                 resultsText.setText("*Client error*");
                 break;
             case 6:
-                //resultsText.setText("*I didn't catch that. Please try again.*");
-                resultsText.setText("Q didn't catch that. Please try again Qnsufficient permissions You do not have access to this device's audio recorder Insufficient permissions You do not have access to this device's audio recorder Insufficient permissions You do not have access to this device's audio recorder");
+                resultsText.setText("*I didn't catch that. Please try again.*");
                 break;
             case 7:
                 resultsText.setText("*No recognition result matched. Please try again.*");
