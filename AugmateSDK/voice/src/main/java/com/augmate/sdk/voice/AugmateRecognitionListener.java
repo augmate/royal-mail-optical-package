@@ -12,7 +12,8 @@ public class AugmateRecognitionListener implements RecognitionListener{
 
     private static final String TAG = "com.augmate.ups.cycle.voice";
     private final IAudioDoneCallback myCallback;
-    private boolean islistening = false;
+    private boolean isListening = false;
+    private boolean hasResults = false;
 
     AugmateRecognitionListener(IAudioDoneCallback iAudioDoneCallback){
         myCallback = iAudioDoneCallback;
@@ -20,12 +21,13 @@ public class AugmateRecognitionListener implements RecognitionListener{
 
     @Override
     public void onReadyForSpeech(Bundle params) {
-        islistening = true;
+        isListening = true;
         Log.d(TAG, "on ready for speech");
     }
 
     @Override
     public void onBeginningOfSpeech() {
+        hasResults = false;
         Log.d(TAG, "on beginning of speech");
     }
 
@@ -46,7 +48,7 @@ public class AugmateRecognitionListener implements RecognitionListener{
     @Override
     public void onError(int error) {
         myCallback.onError(error);
-        islistening = false;
+        isListening = false;
         Log.d(TAG, "on error: " + error);
     }
 
@@ -58,7 +60,8 @@ public class AugmateRecognitionListener implements RecognitionListener{
             Log.d(TAG, "result=" + str);
         }
         myCallback.onResults(stringArrayList);
-        islistening = false;
+        isListening = false;
+        hasResults = true;
         Log.d(TAG, "on results");
     }
 
@@ -74,8 +77,11 @@ public class AugmateRecognitionListener implements RecognitionListener{
         Log.d(TAG, "on event");
     }
 
-    public boolean islistening(){
-        return islistening;
+    public boolean isListening(){
+        return isListening;
     }
 
+    public boolean hasResults() {
+        return hasResults;
+    }
 }

@@ -64,7 +64,7 @@ public class VoiceCaptorPlaceholder extends Activity implements IAudioDoneCallba
 
         Log.debug("Caught key-down on key=" + KeyEvent.keyCodeToString(keycode));
 
-        if (keycode == KeyEvent.KEYCODE_DPAD_CENTER) {
+        if (keycode == KeyEvent.KEYCODE_DPAD_CENTER && !listener.isListening()) {
             start_sound.start();
             pulse_ring.startAnimation(voiceAnim);
             resultsText.setText("");
@@ -120,7 +120,7 @@ public class VoiceCaptorPlaceholder extends Activity implements IAudioDoneCallba
                 resultsText.setText("*Client error*");
                 break;
             case 6:
-                resultsText.setText("*I didn't catch that. Please try again.*");
+                resultsText.setText("*I didn't catch that.\n Please try again.*");
                 break;
             case 7:
                 resultsText.setText("*No recognition result matched. Please try again.*");

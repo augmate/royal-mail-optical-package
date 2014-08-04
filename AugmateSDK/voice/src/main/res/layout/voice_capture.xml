@@ -37,7 +37,7 @@
     android:layout_alignBottom="@+id/imageView"
     android:layout_centerHorizontal="true"
     android:textAlignment="center"
-        />
+    android:layout_alignParentEnd="false"/>
 
     <TextView
     android:layout_width="wrap_content"
@@ -45,11 +45,13 @@
     android:textAppearance="?android:attr/textAppearanceMedium"
     android:text="Tap to begin speaking"
     android:id="@+id/results_field"
-    android:textAlignment="gravity"
+    android:textAlignment="center"
     android:height="100dp"
+    android:layout_alignWithParentIfMissing="false"
+    android:layout_marginTop="48dp"
     android:layout_alignTop="@+id/prompt_field"
     android:layout_centerHorizontal="true"
-    android:layout_marginTop="50dp"/>
+    android:layout_alignParentStart="false"/>
 
     <com.augmate.sdk.voice.SliderView
     android:id="@+id/indeterm_slider"
