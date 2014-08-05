@@ -7,7 +7,8 @@ buildscript {
     }
 }
 
-apply plugin: 'com.android.library'
+//apply plugin: 'java'
+apply plugin: 'android-library'
 
 repositories {
     mavenCentral()
@@ -31,18 +32,19 @@ android {
         }
     }
 
-//    productFlavors {
-//        arm {
-//            ndk {
-//                abiFilters "armeabi", "armeabi-v7a"
-//            }
-//        }
-//        x86 {
-//            ndk {
-//                abiFilter "x86"
-//            }
-//        }
-//    }
+    productFlavors {
+        arm {
+            ndk {
+                abiFilters "armeabi", "armeabi-v7a"
+            }
+        }
+        x86 {
+            ndk {
+                abiFilter "x86"
+            }
+        }
+    }
+
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_7

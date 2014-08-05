@@ -3,7 +3,7 @@
     package="com.augmate.sdk.logger">
 
     <application
-        android:allowBackup="false">
+        android:allowBackup="true">
     </application>
 
 </manifest>
