@@ -16,7 +16,8 @@
         android:tint="#34a7ff"
         android:layout_alignParentStart="false"
         android:layout_alignLeft="@+id/imageView"
-        android:layout_alignTop="@+id/imageView"/>
+        android:layout_alignTop="@+id/imageView"
+        />
 
     <ImageView
     android:layout_width="123dp"
@@ -25,7 +26,8 @@
     android:src="@drawable/augmate_logo"
     android:contentDescription="@string/augmate_logo"
     android:layout_below="@+id/prompt_field"
-    android:layout_centerHorizontal="true"/>
+    android:layout_centerHorizontal="true"
+        />
 
     <TextView
     android:layout_width="wrap_content"

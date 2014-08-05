@@ -32,6 +32,19 @@ android {
         }
     }
 
+    productFlavors {
+        arm {
+            ndk {
+                abiFilters "armeabi", "armeabi-v7a"
+            }
+        }
+        x86 {
+            ndk {
+                abiFilter "x86"
+            }
+        }
+    }
+
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_7
@@ -71,4 +84,3 @@ dependencies {
     compile project(':AugmateSDK:logger')
     compile 'com.android.support:support-v4:19.+'
 }
-
