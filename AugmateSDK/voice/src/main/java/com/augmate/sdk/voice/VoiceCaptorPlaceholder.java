@@ -22,15 +22,18 @@ import java.util.ArrayList;
 public class VoiceCaptorPlaceholder extends Activity implements IAudioDoneCallback {
     AugmateRecognitionListener listener;
     SpeechRecognizer speechRecognizer = SpeechRecognizer.createSpeechRecognizer(this);
-    private TextView promptText;
-    private TextView resultsText;
-    private ImageView logo;
-    private ImageView pulse_ring;
-    private ImageView error_icon;
-    private Animation voiceAnim;
-
-    private MediaPlayer start_sound, success_sound, error_sound;
+    private TextView promptText, resultsText;
+    private ImageView logo, pulse_ring, error_icon;
     private SliderView mProgress;
+    private Animation voiceAnim;
+    private MediaPlayer start_sound, success_sound, error_sound;
+    final Runnable showLoadingBar = new Runnable()
+    {
+        public void run()
+        {
+            if(listener.isProcessing()) mProgress.setVisibility(View.VISIBLE);
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,50 +46,40 @@ public class VoiceCaptorPlaceholder extends Activity implements IAudioDoneCallba
         logo = (ImageView) findViewById(R.id.imageView);
         pulse_ring = (ImageView) findViewById(R.id.imageView2);
         error_icon = (ImageView) findViewById(R.id.imageView3);
+        mProgress = (SliderView) findViewById(R.id.indeterm_slider);
         voiceAnim = new AnimationUtils().loadAnimation(this, R.anim.grow_then_fade);
         start_sound = MediaPlayer.create(this, R.raw.start_sound);
         success_sound = MediaPlayer.create(this, R.raw.correct_sound);
         error_sound = MediaPlayer.create(this, R.raw.wrong_sound);
-        mProgress = (SliderView) findViewById(R.id.indeterm_slider);
         mProgress.startIndeterminate();
     }
 
     private void startListening() {
         speechRecognizer.setRecognitionListener(listener);
-
         Intent recognizerIntent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
                 .putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
                 .putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE, getPackageName())
                 .putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 5);
-
         speechRecognizer.startListening(recognizerIntent);
     }
 
     @Override
     public boolean onKeyDown(int keycode, @SuppressWarnings("NullableProblems") KeyEvent event) {
-
         Log.debug("Caught key-down on key=" + KeyEvent.keyCodeToString(keycode));
-
         if (keycode == KeyEvent.KEYCODE_DPAD_CENTER && !listener.isProcessing()) {
-            start_sound.start();
-            pulse_ring.startAnimation(voiceAnim);
-            resultsText.setText("");
-            promptText.setText("Listening");
-            error_icon.setVisibility(View.INVISIBLE);
+            resultsText.setText(null);
+            promptText.setText("Listening...");
             logo.setImageResource(R.drawable.augmate_logo_blue);
+            error_icon.setVisibility(View.INVISIBLE);
+            pulse_ring.startAnimation(voiceAnim);
+            start_sound.start();
             startListening();
         }
         super.onKeyDown(keycode, event);
         return true;
     }
 
-    final Runnable showLoadingBar = new Runnable()
-    {
-        public void run()
-        {
-            if(listener.isProcessing()) mProgress.setVisibility(View.VISIBLE);
-        }
-    };
+
 
     @Override
     public void onPartial(ArrayList<String> results) {
@@ -96,11 +89,11 @@ public class VoiceCaptorPlaceholder extends Activity implements IAudioDoneCallba
     @Override
     public void onResults(ArrayList<String> results){
         success_sound.start();
-        pulse_ring.clearAnimation();
-        logo.setImageResource(R.drawable.augmate_logo);
-        mProgress.setVisibility(View.INVISIBLE);
         resultsText.setText(TextUtils.join(", ", results));
         promptText.setText("Ready");
+        logo.setImageResource(R.drawable.augmate_logo);
+        mProgress.setVisibility(View.INVISIBLE);
+        pulse_ring.clearAnimation();
     }
 
     @Override
@@ -113,38 +106,38 @@ public class VoiceCaptorPlaceholder extends Activity implements IAudioDoneCallba
     @Override
     public void onError(int error) {
         error_sound.start();
-        pulse_ring.clearAnimation();
+        promptText.setText("Error " + error + ". Try again?");
         logo.setImageResource(R.drawable.augmate_logo_red);
         mProgress.setVisibility(View.INVISIBLE);
-        promptText.setText("Error " + error + ". Try again?");
         error_icon.setVisibility(View.VISIBLE);
+        pulse_ring.clearAnimation();
         switch (error) {
             case 1:
-                resultsText.setText("*No network connection available*");
+                resultsText.setText("No network connection available");
                 break;
             case 2:
-                resultsText.setText("*No network connection available*");
+                resultsText.setText("No network connection available");
                 break;
             case 3:
-                resultsText.setText("*Audio Recording error*");
+                resultsText.setText("Audio Recording error");
                 break;
             case 4:
-                resultsText.setText("*Server error*");
+                resultsText.setText("Server error");
                 break;
             case 5:
-                resultsText.setText("*Client error*");
+                resultsText.setText("Client error. Please try again or check your network connection.");
                 break;
             case 6:
-                resultsText.setText("*I didn't catch that. Please try again.*");
+                resultsText.setText("I didn't catch that. Please try again.");
                 break;
             case 7:
-                resultsText.setText("*No recognition result matched. Please try again.*");
+                resultsText.setText("No recognition result matched. Please try again.");
                 break;
             case 8:
-                resultsText.setText("*Speech recognizer is busy. Please wait then try again.*");
+                resultsText.setText("Speech recognizer is busy. Please wait then try again.");
                 break;
             case 9:
-                resultsText.setText("*Insufficient permissions. You do not have access to this device's audio recorder.*");
+                resultsText.setText("Insufficient permissions. You do not have access to this device's audio recorder.");
                 break;
             default:
                 promptText.setText("Unknown error '" + error + "'. Try again?");
@@ -153,17 +146,22 @@ public class VoiceCaptorPlaceholder extends Activity implements IAudioDoneCallba
 
     @Override
     public void onPause(){
-        start_sound.release();
-        error_sound.release();
-        success_sound.release();
         super.onPause();
         finish();
     }
 
     @Override
     public void onDestroy(){
+        closeMediaPlayer(start_sound);
+        closeMediaPlayer(error_sound);
+        closeMediaPlayer(success_sound);
         if(speechRecognizer!=null)
             speechRecognizer.destroy();
         super.onDestroy();
+    }
+
+    private void closeMediaPlayer(MediaPlayer m){
+        m.reset();
+        m.release();
     }
 }

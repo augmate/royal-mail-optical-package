@@ -38,7 +38,10 @@
     android:layout_centerHorizontal="true"
     android:visibility="visible"
     android:text="Ready"
-    android:phoneNumber="false"/>
+    android:phoneNumber="false"
+    android:singleLine="true"
+    android:paddingStart="@dimen/text_padding"
+    android:paddingEnd="@dimen/text_padding"/>
 
     <TextView
     android:layout_width="wrap_content"
@@ -62,20 +65,13 @@
     android:visibility="invisible"/>
 
     <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/imageView3"
-        android:src="@drawable/error_icon"
-        android:adjustViewBounds="false"
-        android:layout_toLeftOf="@+id/prompt_field"
-        android:layout_alignParentEnd="false"
-        android:cropToPadding="false"
-        android:focusable="false"
-        android:layout_alignParentRight="false"
-        android:layout_alignBottom="@+id/prompt_field"
-        android:layout_alignParentStart="true"
-        android:baselineAlignBottom="false"
-        android:clickable="false"
-        android:visibility="invisible"/>
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:id="@+id/imageView3"
+    android:src="@drawable/error_icon"
+    android:layout_alignBottom="@+id/prompt_field"
+    android:visibility="invisible"
+    android:scaleType="fitEnd"
+    android:layout_toLeftOf="@+id/prompt_field"/>
 
 </RelativeLayout>
