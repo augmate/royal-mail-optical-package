@@ -7,6 +7,7 @@ import com.augmate.sdk.scanner.ScannerPlaceholder;
 import com.augmate.sdk.voice.VoiceCaptorPlaceholder;
 
 public class MainActivity extends Activity {
+    PowerHelper powerHelper = new PowerHelper(this);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -16,7 +17,19 @@ public class MainActivity extends Activity {
         startActivity(intent);
 
         new ScannerPlaceholder();
-
         finish();
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        powerHelper.wake();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        powerHelper.release();
+    }
+
 }

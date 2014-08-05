@@ -1,5 +1,6 @@
 package com.augmate.sdk.logger;
 
+import android.app.ActivityManager;
 import android.content.Context;
 import android.os.Build;
 import android.provider.Settings;
