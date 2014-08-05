@@ -2,6 +2,10 @@ package com.augmate.sdk.voice;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
@@ -20,7 +24,7 @@ import com.augmate.sdk.logger.Log;
 
 import java.util.ArrayList;
 
-public class VoiceCaptorPlaceholder extends Activity implements IAudioDoneCallback {
+public class VoiceCaptorPlaceholder extends Activity implements IAudioDoneCallback,SensorEventListener {
     AugmateRecognitionListener listener;
     SpeechRecognizer speechRecognizer = SpeechRecognizer.createSpeechRecognizer(this);
     private TextView promptText, resultsText;
@@ -30,6 +34,8 @@ public class VoiceCaptorPlaceholder extends Activity implements IAudioDoneCallba
     private MediaPlayer start_sound, success_sound, error_sound;
     private String[] recog_errors = {"NETWORK TIMEOUT","NETWORK","AUDIO","SERVER","CLIENT",
             "SPEECH_TIMEOUT","NO_MATCH","RECOGNIZER_BUSY","INSUFFICIENT_PERMISSIONS"};
+    private boolean gyroLock = false;
+    private SensorManager mSensorManager;
     final Runnable showLoadingBar = new Runnable()
     {
         public void run()
@@ -60,6 +66,8 @@ public class VoiceCaptorPlaceholder extends Activity implements IAudioDoneCallba
         success_sound = MediaPlayer.create(this, R.raw.correct_sound);
         error_sound = MediaPlayer.create(this, R.raw.wrong_sound);
         mProgress.startIndeterminate();
+        mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
+        mSensorManager.registerListener(this, mSensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE), SensorManager.SENSOR_DELAY_NORMAL);
     }
 
     private void startListening() {
@@ -102,6 +110,7 @@ public class VoiceCaptorPlaceholder extends Activity implements IAudioDoneCallba
         logo.setImageResource(R.drawable.augmate_logo_solid);
         mProgress.setVisibility(View.INVISIBLE);
         pulse_ring.clearAnimation();
+        gyroLock = false;
     }
 
     @Override
@@ -119,6 +128,7 @@ public class VoiceCaptorPlaceholder extends Activity implements IAudioDoneCallba
         mProgress.setVisibility(View.INVISIBLE);
         error_icon.setVisibility(View.VISIBLE);
         pulse_ring.clearAnimation();
+        gyroLock = false;
         switch (error) {
             case 1:
                 resultsText.setText("No network connection available");
@@ -172,4 +182,22 @@ public class VoiceCaptorPlaceholder extends Activity implements IAudioDoneCallba
         m.reset();
         m.release();
     }
+
+    public void onSensorChanged(SensorEvent event) {
+        double gyroX = event.values[1];
+        double gyroY = event.values[0];
+        if(event.sensor.getType() == Sensor.TYPE_GYROSCOPE && !gyroLock){
+            if(gyroY<-1){  //nod down
+                this.onKeyDown(KeyEvent.KEYCODE_DPAD_CENTER, null);
+                gyroLock = true;
+            }
+            else if(gyroY>1); //nod up
+            else if(gyroX>1);  //right
+            else if(gyroX<-1); //left
+            if(gyroY<1 && gyroY>-1); //stable
+        }
+    }
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {}
 }
