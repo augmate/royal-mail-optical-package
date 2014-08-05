@@ -18,8 +18,8 @@ public class MainActivity extends Activity {
         startActivity(intent);
 
         // or spawn optical scanner
-//        Intent intent = new Intent(this, ScannerPlaceholder.class);
-//        startActivity(intent);
+        //Intent intent = new Intent(this, ScannerPlaceholder.class);
+        //startActivity(intent);
 
         finish();
     }

@@ -11,6 +11,8 @@ import java.io.IOException;
 class CameraController {
 
     Camera camera;
+    private byte[][] frameCaptureBuffers;
+    private int lastCaptureBufferIdx;
 
     /**
      * Configures camera around a rendering context
@@ -19,7 +21,7 @@ class CameraController {
      * @param height
      * @param surfaceHolder
      */
-    public void startFrameCapture(SurfaceHolder surfaceHolder, Camera.PreviewCallback callback, int width, int height) {
+    public void beginFrameCapture(SurfaceHolder surfaceHolder, Camera.PreviewCallback callback, int width, int height) {
         assert (surfaceHolder != null);
         assert (camera == null);
 
@@ -30,22 +32,25 @@ class CameraController {
             Log.debug("  Camera #%d facing=%d orientation=%d", i, cameraInfo.facing, cameraInfo.orientation);
         }
 
-        // try to open the first camera available
+        Log.ScopeTimer cameraTimer = Log.startTimer("Opening camera took %d msec");
+
+        // try to open the first available camera
         try {
             camera = Camera.open();
+            camera.setErrorCallback(new Camera.ErrorCallback() {
+                @Override
+                public void onError(int i, Camera camera) {
+                    Log.debug("Camera had an error: %d", i);
+                }
+            });
             camera.setPreviewDisplay(surfaceHolder);
         } catch (IOException e) {
             Log.exception(e, "Failed to open camera interface");
         }
 
-        camera.setErrorCallback(new Camera.ErrorCallback() {
-            @Override
-            public void onError(int i, Camera camera) {
-                Log.debug("Camera had an error: %d", i);
-            }
-        });
+        cameraTimer.stopTimer();
 
-        Camera.Parameters params = buildCameraConfiguration(camera, width, height);
+        Camera.Parameters params = createCameraConfigurationParameters(camera, width, height);
 
         camera.setParameters(params);
 
@@ -54,22 +59,31 @@ class CameraController {
 
         Log.debug("Camera accepted frame size: %d x %d", width, height);
 
-        camera.addCallbackBuffer(new byte[width * height * 3]);
-        camera.addCallbackBuffer(new byte[width * height * 3]);
+        lastCaptureBufferIdx = 0;
+        frameCaptureBuffers = new byte[2][width * height * 3]; // two frame buffers
+        camera.addCallbackBuffer(frameCaptureBuffers[lastCaptureBufferIdx]); // start with the first buffer
         camera.setPreviewCallbackWithBuffer(callback);
 
         camera.startPreview();
         camera.startSmoothZoom(14);
     }
 
-    public void stopFrameCapture() {
+    public void endFrameCapture() {
         camera.stopPreview();
         camera.release();
         camera = null;
     }
 
+    public void changeFrameBuffer() {
+        lastCaptureBufferIdx = ++lastCaptureBufferIdx % 2;
+    }
 
-    private Camera.Parameters buildCameraConfiguration(Camera mCamera, int previewFrameWidth, int previewFrameHeight) {
+    public void requestAnotherFrame() {
+        camera.addCallbackBuffer(frameCaptureBuffers[lastCaptureBufferIdx]);
+    }
+
+
+    private Camera.Parameters createCameraConfigurationParameters(Camera mCamera, int previewFrameWidth, int previewFrameHeight) {
         // configure camera
         Camera.Parameters params = mCamera.getParameters();
 

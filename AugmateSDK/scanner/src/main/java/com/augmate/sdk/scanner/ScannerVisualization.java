@@ -12,6 +12,7 @@ public class ScannerVisualization extends Fragment implements SurfaceHolder.Call
     private OnScannerResultListener mListener;
     private SurfaceView surfaceView;
     private CameraController cameraController = new CameraController();
+    private boolean isProcessingCapturedFrames;
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
@@ -48,12 +49,14 @@ public class ScannerVisualization extends Fragment implements SurfaceHolder.Call
         SurfaceHolder holder = surfaceView.getHolder();
         holder.removeCallback(this);
         holder.addCallback(this);
+        isProcessingCapturedFrames = false;
     }
 
     @Override
     public void onPause() {
         super.onPause();
         Log.debug("Paused");
+        isProcessingCapturedFrames = false;
     }
 
     public void onScannerSuccess(String data) {
@@ -83,7 +86,8 @@ public class ScannerVisualization extends Fragment implements SurfaceHolder.Call
     @Override
     public void surfaceCreated(SurfaceHolder surfaceHolder) {
         Log.debug("Surface has been created");
-        //cameraController.startFrameCapture(surfaceHolder, this, 640, 360);
+        Log.debug("Surface has size of %d x %d", surfaceHolder.getSurfaceFrame().width(), surfaceHolder.getSurfaceFrame().height());
+        cameraController.beginFrameCapture(surfaceHolder, this, 640, 360);
     }
 
     @Override
@@ -94,12 +98,26 @@ public class ScannerVisualization extends Fragment implements SurfaceHolder.Call
     @Override
     public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
         Log.debug("Surface has been destroyed");
-        //cameraController.stopFrameCapture();
+        cameraController.endFrameCapture();
     }
 
     @Override
     public void onPreviewFrame(byte[] bytes, Camera camera) {
+        if(!isProcessingCapturedFrames) {
+            Log.debug("Ignoring new frame because we are paused");
+            return;
+        }
+
         Log.debug("New frame is available @ 0x%X", bytes.hashCode());
+
+        // if we can schedule frame-buffer processing
+        //   kick off processing in a different thread
+        //   change preview-frame's buffer
+        cameraController.changeFrameBuffer();
+
+
+        // queue up next frame for capture
+        cameraController.requestAnotherFrame();
     }
 
     public interface OnScannerResultListener {

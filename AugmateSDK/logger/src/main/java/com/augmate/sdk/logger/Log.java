@@ -1,8 +1,8 @@
 package com.augmate.sdk.logger;
 
-import android.app.ActivityManager;
 import android.content.Context;
 import android.os.Build;
+import android.os.SystemClock;
 import android.provider.Settings;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
@@ -94,5 +94,25 @@ public class Log {
 
     public static void info(String format, Object... args) {
         getLogger().info(String.format(format, args));
+    }
+
+    public static ScopeTimer startTimer(String format) {
+        return new ScopeTimer(format);
+    }
+
+    public static class ScopeTimer {
+        public long start;
+        public long span;
+        public String str;
+
+        public ScopeTimer(String str) {
+            this.start = SystemClock.elapsedRealtime();
+            this.str = str;
+        }
+
+        public void stopTimer() {
+            span = SystemClock.elapsedRealtime() - start;
+            Log.info(str, span);
+        }
     }
 }
