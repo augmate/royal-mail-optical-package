@@ -3,10 +3,10 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:0.10.+'
+        classpath 'com.android.tools.build:gradle:0.12.1'
     }
 }
-apply plugin: 'android'
+apply plugin: 'com.android.application'
 
 repositories {
     mavenCentral()
@@ -15,6 +15,14 @@ repositories {
 android {
     compileSdkVersion "Google Inc.:Glass Development Kit Preview:19"
     buildToolsVersion '20.0.0'
+
+    // to make gradle 0.12 happy
+    useOldManifestMerger true
+
+    // log4j is causing a LOT of lint errors :(
+    lintOptions {
+        abortOnError false
+    }
 
     defaultConfig {
         minSdkVersion 19

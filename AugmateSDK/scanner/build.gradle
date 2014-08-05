@@ -3,12 +3,11 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:0.10.+'
+        classpath 'com.android.tools.build:gradle:0.12.1'
     }
 }
 
-//apply plugin: 'java'
-apply plugin: 'android-library'
+apply plugin: 'com.android.library'
 
 repositories {
     mavenCentral()
@@ -32,19 +31,18 @@ android {
         }
     }
 
-    productFlavors {
-        arm {
-            ndk {
-                abiFilters "armeabi", "armeabi-v7a"
-            }
-        }
-        x86 {
-            ndk {
-                abiFilter "x86"
-            }
-        }
-    }
-
+//    productFlavors {
+//        arm {
+//            ndk {
+//                abiFilters "armeabi", "armeabi-v7a"
+//            }
+//        }
+//        x86 {
+//            ndk {
+//                abiFilter "x86"
+//            }
+//        }
+//    }
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_7
