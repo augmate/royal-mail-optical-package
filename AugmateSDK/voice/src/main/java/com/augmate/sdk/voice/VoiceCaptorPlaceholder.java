@@ -28,6 +28,8 @@ public class VoiceCaptorPlaceholder extends Activity implements IAudioDoneCallba
     private SliderView mProgress;
     private Animation voiceAnim;
     private MediaPlayer start_sound, success_sound, error_sound;
+    private String[] recog_errors = {"NETWORK TIMEOUT","NETWORK","AUDIO","SERVER","CLIENT",
+            "SPEECH_TIMEOUT","NO_MATCH","RECOGNIZER_BUSY","INSUFFICIENT_PERMISSIONS"};
     final Runnable showLoadingBar = new Runnable()
     {
         public void run()
@@ -75,7 +77,7 @@ public class VoiceCaptorPlaceholder extends Activity implements IAudioDoneCallba
         if (keycode == KeyEvent.KEYCODE_DPAD_CENTER && !listener.isProcessing()) {
             resultsText.setText(null);
             promptText.setText("Listening...");
-            logo.setImageResource(R.drawable.augmate_logo_blue);
+            logo.setImageResource(R.drawable.augmate_logo_blue_solid);
             error_icon.setVisibility(View.INVISIBLE);
             pulse_ring.startAnimation(voiceAnim);
             start_sound.start();
@@ -97,7 +99,7 @@ public class VoiceCaptorPlaceholder extends Activity implements IAudioDoneCallba
         success_sound.start();
         resultsText.setText(TextUtils.join(", ", results));
         promptText.setText("Ready");
-        logo.setImageResource(R.drawable.augmate_logo);
+        logo.setImageResource(R.drawable.augmate_logo_solid);
         mProgress.setVisibility(View.INVISIBLE);
         pulse_ring.clearAnimation();
     }
@@ -112,8 +114,8 @@ public class VoiceCaptorPlaceholder extends Activity implements IAudioDoneCallba
     @Override
     public void onError(int error) {
         error_sound.start();
-        promptText.setText("Error " + error + ". Try again?");
-        logo.setImageResource(R.drawable.augmate_logo_red);
+        promptText.setText("Error " + error + ": " + recog_errors[error-1] + " ERROR");
+        logo.setImageResource(R.drawable.augmate_logo_red_solid);
         mProgress.setVisibility(View.INVISIBLE);
         error_icon.setVisibility(View.VISIBLE);
         pulse_ring.clearAnimation();

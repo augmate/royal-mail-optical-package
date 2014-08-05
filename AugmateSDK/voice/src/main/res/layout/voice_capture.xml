@@ -17,17 +17,18 @@
         android:layout_alignParentStart="false"
         android:layout_alignLeft="@+id/imageView"
         android:layout_alignTop="@+id/imageView"
+        android:cropToPadding="false"
         />
 
     <ImageView
     android:layout_width="123dp"
     android:layout_height="123dp"
     android:id="@+id/imageView"
-    android:src="@drawable/augmate_logo"
+    android:src="@drawable/augmate_logo_solid"
     android:contentDescription="@string/augmate_logo"
     android:layout_below="@+id/prompt_field"
     android:layout_centerHorizontal="true"
-        />
+    android:baselineAlignBottom="true"/>
 
     <TextView
     android:layout_width="wrap_content"
