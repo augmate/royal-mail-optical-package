@@ -10,6 +10,7 @@ import android.speech.SpeechRecognizer;
 import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.Window;
 import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
@@ -38,7 +39,12 @@ public class VoiceCaptorPlaceholder extends Activity implements IAudioDoneCallba
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        getWindow().requestFeature(Window.FEATURE_NO_TITLE);
+        getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
+
         setContentView(R.layout.voice_capture);
         listener = new AugmateRecognitionListener(this);
         resultsText = (TextView) findViewById(R.id.results_field);
@@ -47,7 +53,7 @@ public class VoiceCaptorPlaceholder extends Activity implements IAudioDoneCallba
         pulse_ring = (ImageView) findViewById(R.id.imageView2);
         error_icon = (ImageView) findViewById(R.id.imageView3);
         mProgress = (SliderView) findViewById(R.id.indeterm_slider);
-        voiceAnim = new AnimationUtils().loadAnimation(this, R.anim.grow_then_fade);
+        voiceAnim = AnimationUtils.loadAnimation(this, R.anim.grow_then_fade);
         start_sound = MediaPlayer.create(this, R.raw.start_sound);
         success_sound = MediaPlayer.create(this, R.raw.correct_sound);
         error_sound = MediaPlayer.create(this, R.raw.wrong_sound);

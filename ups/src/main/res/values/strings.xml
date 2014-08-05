@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">cycle</string>
+    <string name="app_name">Cycle Counting</string>
     <string name="hello_world">Hello world!</string>
     <string name="augmate_logo">augmate</string>
 
