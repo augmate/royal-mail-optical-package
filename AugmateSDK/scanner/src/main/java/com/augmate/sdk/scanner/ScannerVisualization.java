@@ -19,6 +19,18 @@ public class ScannerVisualization extends Fragment implements SurfaceHolder.Call
     private DecodeThread decodingThread;
     private boolean readyForNextFrame = true;
 
+    private class FramebufferSettings {
+        public final int width;
+        public final int height;
+
+        private FramebufferSettings(int width, int height) {
+            this.width = width;
+            this.height = height;
+        }
+    }
+
+    private FramebufferSettings frameBufferSettings = new FramebufferSettings(1280, 720);
+
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
@@ -39,7 +51,7 @@ public class ScannerVisualization extends Fragment implements SurfaceHolder.Call
         ViewGroup.LayoutParams layout = surfaceView.getLayoutParams();
         layout.width = 640;
         layout.height = 360;
-        surfaceView.setLayoutParams(layout);
+        //surfaceView.setLayoutParams(layout);
         //debugger.setLayoutParams(layout);
 
         Log.debug("View created?");
@@ -108,12 +120,14 @@ public class ScannerVisualization extends Fragment implements SurfaceHolder.Call
     public void surfaceCreated(SurfaceHolder surfaceHolder) {
         Log.debug("Surface has been created");
         Log.debug("Surface has size of %d x %d", surfaceHolder.getSurfaceFrame().width(), surfaceHolder.getSurfaceFrame().height());
-        cameraController.beginFrameCapture(surfaceHolder, this, 640, 360);
     }
 
     @Override
     public void surfaceChanged(SurfaceHolder surfaceHolder, int i, int i2, int i3) {
         Log.debug("Surface has changed");
+        Log.debug("Surface has size of %d x %d", surfaceHolder.getSurfaceFrame().width(), surfaceHolder.getSurfaceFrame().height());
+        cameraController.endFrameCapture();
+        cameraController.beginFrameCapture(surfaceHolder, this, frameBufferSettings.width, frameBufferSettings.height);
     }
 
     @Override
@@ -134,7 +148,7 @@ public class ScannerVisualization extends Fragment implements SurfaceHolder.Call
         if (readyForNextFrame) {
             // kick-off processing in a different thread
             decodingThread.getMsgPump()
-                    .obtainMessage(R.id.newDecodeJob, new DecodingJob(640, 360, bytes))
+                    .obtainMessage(R.id.newDecodeJob, new DecodingJob(frameBufferSettings.width, frameBufferSettings.height, bytes))
                     .sendToTarget();
 
             // change capture-buffer to prevent camera from modifying buffer sent to decoder

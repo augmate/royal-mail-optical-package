@@ -79,10 +79,12 @@ class CameraController {
     }
 
     public void endFrameCapture() {
-        Log.debug("Stopping camera frame-grabbing");
-        camera.stopPreview();
-        camera.release();
-        camera = null;
+        if(camera != null) {
+            Log.debug("Stopping camera frame-grabbing");
+            camera.stopPreview();
+            camera.release();
+            camera = null;
+        }
     }
 
     public void changeFrameBuffer() {

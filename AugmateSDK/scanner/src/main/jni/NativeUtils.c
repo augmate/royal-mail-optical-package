@@ -13,12 +13,7 @@ JNIEXPORT void JNICALL Java_com_augmate_sdk_scanner_NativeUtils_binarize(
     jbyte* src = (*env)->GetByteArrayElements(env, srcArray, NULL);
     jbyte* dst = (*env)->GetByteArrayElements(env, dstArray, NULL);
 
-    int i;
-    for(i = 0; i < width * height; i ++) {
-        int value = (src[i] & 0xFF) < 80 ? 0 : 255;
-        //dst[i] = 0xff000000 | ((value << 8) & 0x0000ff00);
-        dst[i] = value & 0xFF;
-    }
+    binarizerSimpleByteArray(src, dst, width, height);
 
     (*env)->ReleaseByteArrayElements(env, srcArray, src, JNI_ABORT);
     (*env)->ReleaseByteArrayElements(env, dstArray, dst, 0);

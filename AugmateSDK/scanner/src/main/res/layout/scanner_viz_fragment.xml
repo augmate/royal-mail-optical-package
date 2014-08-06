@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ScannerVisualization"
-    android:background="#ff243566"
+    android:background="#ff2435a6"
     android:alpha="1">
 
     <SurfaceView
@@ -12,8 +12,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:minWidth="640dp"
-        android:minHeight="360dp"
-        android:background="#ffa1f06d" />
+        android:minHeight="360dp" />
 
     <com.augmate.sdk.scanner.ScannerVisualDebugger
         android:id="@+id/scanner_visual_debugger"

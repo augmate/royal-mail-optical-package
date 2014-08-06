@@ -3,7 +3,7 @@ package com.augmate.cycle.ups;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import com.augmate.sdk.voice.VoiceCaptorPlaceholder;
+import com.augmate.sdk.scanner.ScannerPlaceholder;
 
 public class MainActivity extends Activity {
     PowerHelper powerHelper = new PowerHelper(this);
@@ -14,12 +14,12 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
 
         // spawn voice capture
-        Intent intent = new Intent(this, VoiceCaptorPlaceholder.class);
-        startActivity(intent);
+//        Intent intent = new Intent(this, VoiceCaptorPlaceholder.class);
+//        startActivity(intent);
 
         // or spawn optical scanner
-        //Intent intent = new Intent(this, ScannerPlaceholder.class);
-        //startActivity(intent);
+        Intent intent = new Intent(this, ScannerPlaceholder.class);
+        startActivity(intent);
 
         finish();
     }
