@@ -27,7 +27,8 @@ public class ScannerVisualDebugger extends View {
     private Paint _PaintColor;
     public int rawImgWidth = 0;
     public int rawImgHeight = 0;
-    public int[] debugImg = null;
+    public int[][] debugImg = null;
+    public int currentDebugBufferIdx = 0;
 
     public ScannerVisualDebugger(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
@@ -61,6 +62,14 @@ public class ScannerVisualDebugger extends View {
         outlinePointsColor.setStrokeWidth(20.0f);
     }
 
+    public int[] getNextDebugBuffer() {
+        return debugImg[(currentDebugBufferIdx+1)%2];
+    }
+
+    public void flipDebugBuffer() {
+        currentDebugBufferIdx = (currentDebugBufferIdx+1) % 2;
+    }
+
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
@@ -68,7 +77,7 @@ public class ScannerVisualDebugger extends View {
         canvas.drawRect(20, 20, 340, 160, _PaintColor);
 
         if(debugImg != null) {
-            canvas.drawBitmap(debugImg, 0, rawImgWidth, 0, 0, rawImgWidth, rawImgHeight, true, null);
+            canvas.drawBitmap(debugImg[currentDebugBufferIdx], 0, rawImgWidth, 0, 0, rawImgWidth, rawImgHeight, true, null);
         }
 
         ArrayList<Point> pts = new ArrayList<Point>(mMessagePoints);
@@ -119,6 +128,12 @@ public class ScannerVisualDebugger extends View {
         return msgHandler;
     }
     private final DebugVizHandler msgHandler = new DebugVizHandler(this);
+
+    public void setFrameBufferSettings(int width, int height) {
+        debugImg = new int[2][width * height];
+        rawImgWidth = width;
+        rawImgHeight = height;
+    }
 
     private static class DebugVizHandler extends Handler {
         private final String TAG = DebugVizHandler.class.getName();

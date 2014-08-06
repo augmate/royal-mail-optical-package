@@ -1,6 +1,7 @@
 package com.augmate.sdk.scanner.decoding;
 
 import android.os.SystemClock;
+import com.google.zxing.Result;
 
 public class DecodingJob {
 
@@ -8,6 +9,7 @@ public class DecodingJob {
     private final int width;
     private final int height;
     private final byte[] luminance;
+    private int[] debugOutputBuffer;
     public final long requestedAt;
 
     // filled out by decoder (consumer)
@@ -16,11 +18,13 @@ public class DecodingJob {
     public long decodeStartedAt;
     // TODO: public Result result;
 
+    public Result result;
 
-    public DecodingJob(int width, int height, byte[] luminance) {
+    public DecodingJob(int width, int height, byte[] luminance, int[] debugOutputBuffer) {
         this.width = width;
         this.height = height;
         this.luminance = luminance;
+        this.debugOutputBuffer = debugOutputBuffer;
         this.requestedAt = SystemClock.elapsedRealtime();
     }
 
@@ -46,5 +50,9 @@ public class DecodingJob {
 
     public byte[] getLuminance() {
         return luminance;
+    }
+
+    public int[] getDebugOutputBuffer() {
+        return debugOutputBuffer;
     }
 }

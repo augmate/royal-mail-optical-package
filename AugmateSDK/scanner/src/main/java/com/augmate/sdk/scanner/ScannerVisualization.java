@@ -9,6 +9,7 @@ import android.support.v4.app.Fragment;
 import android.view.*;
 import com.augmate.sdk.logger.Log;
 import com.augmate.sdk.scanner.decoding.DecodingJob;
+import com.google.zxing.ResultPoint;
 
 public class ScannerVisualization extends Fragment implements SurfaceHolder.Callback, Camera.PreviewCallback {
     private ScannerVisualDebugger debugger;
@@ -18,17 +19,6 @@ public class ScannerVisualization extends Fragment implements SurfaceHolder.Call
     private boolean isProcessingCapturedFrames;
     private DecodeThread decodingThread;
     private boolean readyForNextFrame = true;
-
-    private class FramebufferSettings {
-        public final int width;
-        public final int height;
-
-        private FramebufferSettings(int width, int height) {
-            this.width = width;
-            this.height = height;
-        }
-    }
-
     private FramebufferSettings frameBufferSettings = new FramebufferSettings(1280, 720);
 
     @Override
@@ -45,14 +35,9 @@ public class ScannerVisualization extends Fragment implements SurfaceHolder.Call
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.scanner_viz_fragment, container, false);
-        //debugger = (ScannerVisualDebugger) view.findViewById(R.id.scanner_visual_debugger);
-        surfaceView = (SurfaceView) view.findViewById(R.id.camera_preview);
 
-        ViewGroup.LayoutParams layout = surfaceView.getLayoutParams();
-        layout.width = 640;
-        layout.height = 360;
-        //surfaceView.setLayoutParams(layout);
-        //debugger.setLayoutParams(layout);
+        debugger = (ScannerVisualDebugger) view.findViewById(R.id.scanner_visual_debugger);
+        surfaceView = (SurfaceView) view.findViewById(R.id.camera_preview);
 
         Log.debug("View created?");
 
@@ -126,6 +111,11 @@ public class ScannerVisualization extends Fragment implements SurfaceHolder.Call
     public void surfaceChanged(SurfaceHolder surfaceHolder, int i, int i2, int i3) {
         Log.debug("Surface has changed");
         Log.debug("Surface has size of %d x %d", surfaceHolder.getSurfaceFrame().width(), surfaceHolder.getSurfaceFrame().height());
+
+        // configure debugging render-target
+        debugger.setFrameBufferSettings(frameBufferSettings.width, frameBufferSettings.height);
+
+        // configure camera frame-grabbing
         cameraController.endFrameCapture();
         cameraController.beginFrameCapture(surfaceHolder, this, frameBufferSettings.width, frameBufferSettings.height);
     }
@@ -147,8 +137,11 @@ public class ScannerVisualization extends Fragment implements SurfaceHolder.Call
 
         if (readyForNextFrame) {
             // kick-off processing in a different thread
+
+            DecodingJob job = new DecodingJob(frameBufferSettings.width, frameBufferSettings.height, bytes, debugger.getNextDebugBuffer());
+
             decodingThread.getMsgPump()
-                    .obtainMessage(R.id.newDecodeJob, new DecodingJob(frameBufferSettings.width, frameBufferSettings.height, bytes))
+                    .obtainMessage(R.id.newDecodeJob, job)
                     .sendToTarget();
 
             // change capture-buffer to prevent camera from modifying buffer sent to decoder
@@ -161,13 +154,35 @@ public class ScannerVisualization extends Fragment implements SurfaceHolder.Call
         cameraController.requestAnotherFrame();
     }
 
-    private void onDecodeCompleted(DecodingJob obj) {
-        Log.debug("Decoded; queue-overhead=%d msec, binarization=%d msec, total=%d msec", obj.queueDuration(), obj.binarizationDuration(), obj.totalDuration());
+    private void onDecodeCompleted(DecodingJob job) {
+        Log.debug("Decoded; queue-overhead=%d msec, binarization=%d msec, total=%d msec", job.queueDuration(), job.binarizationDuration(), job.totalDuration());
+
+        if (job.result != null) {
+            ResultPoint[] pts = job.result.getResultPoints();
+            Log.info("Found qr code points: (%.1f,%.1f) (%.1f,%.1f) (%.1f,%.1f)", pts[0].getX(), pts[0].getY(), pts[1].getX(), pts[1].getY(), pts[2].getX(), pts[2].getY());
+        }
+
+        // tell debugger they can use the buffer we wrote decoding debug data to
+        debugger.flipDebugBuffer();
+        // tell frame-grabber we can push next (or most recently grabbed) frame to the decoder
         readyForNextFrame = true;
+
+        // TODO: try pushing next frame (if we got one) from here
+        // may reduce delays by length of one frame (ie 50ms at 20fps)
     }
 
     public interface OnScannerResultListener {
         public void onBarcodeScanSuccess(String result);
+    }
+
+    private class FramebufferSettings {
+        public final int width;
+        public final int height;
+
+        private FramebufferSettings(int width, int height) {
+            this.width = width;
+            this.height = height;
+        }
     }
 
     // handles messages pushed into parent activity's thread
