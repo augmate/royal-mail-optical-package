@@ -32,6 +32,8 @@ android {
         }
     }
 
+//    Bah flavors don't work with unit tests?!
+
 //    productFlavors {
 //        arm {
 //            ndk {
