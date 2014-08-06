@@ -29,13 +29,21 @@ public class ScannerVisualDebugger extends View {
     public int rawImgHeight = 0;
     public int[] debugImg = null;
 
-    public ScannerVisualDebugger(Context context) {
-        super(context);
-        preparePaints();
+    public ScannerVisualDebugger(Context context, AttributeSet attrs, int defStyleAttr) {
+        super(context, attrs, defStyleAttr);
     }
 
-    public ScannerVisualDebugger(Context context, AttributeSet attr) {
-        super(context, attr);
+    public ScannerVisualDebugger(Context context, AttributeSet attrs) {
+        super(context, attrs);
+    }
+
+    public ScannerVisualDebugger(Context context) {
+        super(context);
+    }
+
+    @Override
+    protected void onFinishInflate() {
+        super.onFinishInflate();
         preparePaints();
     }
 
@@ -122,7 +130,7 @@ public class ScannerVisualDebugger extends View {
 
         @Override
         public void handleMessage(Message message) {
-            if (message.what == R.id.visualizationNewData) {
+            if (message.what == R.id.newDecodeJob) {
                 Log.d(TAG, "Got new points for visualization");
                 Point[] pts = (Point[]) message.obj;
                 if (pts.length == 3)

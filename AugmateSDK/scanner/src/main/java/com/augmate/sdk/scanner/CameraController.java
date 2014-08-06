@@ -40,6 +40,8 @@ class CameraController {
             camera.setErrorCallback(new Camera.ErrorCallback() {
                 @Override
                 public void onError(int i, Camera camera) {
+                    // i've seen error-code 100 here. sometimes camera enters a broken state
+                    // in which no camera-app can work. restarting emulator/device fixes it.
                     Log.debug("Camera had an error: %d", i);
                 }
             });
@@ -64,11 +66,20 @@ class CameraController {
         camera.addCallbackBuffer(frameCaptureBuffers[lastCaptureBufferIdx]); // start with the first buffer
         camera.setPreviewCallbackWithBuffer(callback);
 
-        camera.startPreview();
+        try {
+            camera.startPreview();
+        }
+        catch(Exception err) {
+            // FIXME: it's possible to get the emulator and glass into a state where the camera stops responding
+            //        probably a problem with the underlying Camera HAL. restarting fixes it.
+            Log.exception(err, "Failed to start camera frame feed!");
+        }
+
         camera.startSmoothZoom(14);
     }
 
     public void endFrameCapture() {
+        Log.debug("Stopping camera frame-grabbing");
         camera.stopPreview();
         camera.release();
         camera = null;

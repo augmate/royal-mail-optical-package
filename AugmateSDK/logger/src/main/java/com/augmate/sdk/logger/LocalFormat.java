@@ -17,7 +17,7 @@ public class LocalFormat extends Layout
     public String format(LoggingEvent event) {
         String caller = LogEntriesFormat.getFrame(0);
         String thread = Thread.currentThread().getName();
-        String formatted = "[Device=" + deviceId + "] #" + sessionId + " | " + thread + " | " + caller + "()";
+        String formatted = "" + deviceId + " | #" + sessionId + " | " + String.format("%-9s", thread) + " | " + caller + "()";
 
         return formatted + "; " + event.getMessage();
     }

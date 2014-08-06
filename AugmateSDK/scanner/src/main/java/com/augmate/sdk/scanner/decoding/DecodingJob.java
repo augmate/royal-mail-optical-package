@@ -8,10 +8,12 @@ public class DecodingJob {
     private final int width;
     private final int height;
     private final byte[] luminance;
-    private final long requestedAt;
+    public final long requestedAt;
 
     // filled out by decoder (consumer)
-    public long decodedAt;
+    public long decodeCompletedAt;
+    public long binarizationAt;
+    public long decodeStartedAt;
     // TODO: public Result result;
 
 
@@ -20,6 +22,18 @@ public class DecodingJob {
         this.height = height;
         this.luminance = luminance;
         this.requestedAt = SystemClock.elapsedRealtime();
+    }
+
+    public long binarizationDuration() {
+        return decodeCompletedAt - binarizationAt;
+    }
+
+    public long totalDuration() {
+        return decodeCompletedAt - requestedAt;
+    }
+
+    public long queueDuration() {
+        return decodeStartedAt - requestedAt;
     }
 
     public int getWidth() {

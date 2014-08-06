@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <item name="visualizationNewData" type="id" />
+    <item name="newDecodeJob" type="id" />
+    <item name="decodeJobCompleted" type="id" />
+    <item name="stopDecodingThread" type="id" />
 </resources>

@@ -43,4 +43,5 @@ dependencies {
     compile 'com.logentries:logentries-appender:1.1.25'
     compile 'joda-time:joda-time:2.3'
     compile 'log4j:log4j:1.2.17'
+    compile 'org.apache.commons:commons-lang3:3.3.2'
 }

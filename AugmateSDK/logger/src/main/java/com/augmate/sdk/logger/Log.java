@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Build;
 import android.os.SystemClock;
 import android.provider.Settings;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
@@ -17,7 +18,6 @@ import org.apache.log4j.Logger;
  * popped off the stack to identify the exact caller we care about 
  */
 public class Log {
-    private static final String TAG = Log.class.getName();
     private static Logger loggerInstance;
 
     /**
@@ -30,10 +30,9 @@ public class Log {
             String deviceId = "N/A";
 
             if (ctx == null) {
-                android.util.Log.w(TAG, "Log::start(null); called without a ctx; creating Log without device-id");
+                android.util.Log.w("Augmate", "Log::start(null); called without a ctx; creating Log without device-id");
             } else {
                 deviceId = Settings.Secure.getString(ctx.getContentResolver(), Settings.Secure.ANDROID_ID);
-                //android.util.Log.d(TAG, "getLogger() found device-id: " + deviceId);
             }
 
             loggerInstance = createInstance(deviceId);
@@ -89,7 +88,15 @@ public class Log {
     }
 
     public static void debug(String format, Object... args) {
-        getLogger().debug(String.format(format, args));
+        String str = null;
+        try {
+            str = String.format(format, args);
+        } catch(Exception err) {
+            getLogger().error("Error formatting string: " + format);
+            getLogger().error(ExceptionUtils.getStackTrace(err));
+        }
+        if(str != null)
+            getLogger().debug(str);
     }
 
     public static void info(String format, Object... args) {
