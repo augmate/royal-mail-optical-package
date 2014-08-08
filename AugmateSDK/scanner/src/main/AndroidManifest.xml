@@ -4,6 +4,7 @@
 
     <application
         android:allowBackup="true">
-    </application>
 
+        <activity android:name="com.augmate.sdk.scanner.ScannerPlaceholder" />
+    </application>
 </manifest>
