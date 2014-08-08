@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import com.augmate.sdk.logger.Log;
+import com.augmate.sdk.scanner.scandit_decoder.ScanditWrapper;
 
 public class ScannerPlaceholder extends FragmentActivity implements ScannerVisualization.OnScannerResultListener {
 
@@ -36,6 +37,8 @@ public class ScannerPlaceholder extends FragmentActivity implements ScannerVisua
         setContentView(R.layout.scanner_activity);
 
         Log.debug("Created scanner activity");
+
+        ScanditWrapper.initializeScandit(getBaseContext());
     }
 
     @Override

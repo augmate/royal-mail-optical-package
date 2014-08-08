@@ -1,5 +1,7 @@
 package com.augmate.sdk.scanner;
 
+import android.os.SystemClock;
+import com.augmate.sdk.logger.Log;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;

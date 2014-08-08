@@ -2,7 +2,9 @@ package com.augmate.cycle.ups;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
+import com.augmate.sdk.logger.Log;
 import com.augmate.sdk.scanner.ScannerPlaceholder;
 
 public class MainActivity extends Activity {
@@ -12,6 +14,8 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        Log.debug("Build.MODEL = " + Build.MODEL);
 
         // spawn voice capture
 //        Intent intent = new Intent(this, VoiceCaptorPlaceholder.class);

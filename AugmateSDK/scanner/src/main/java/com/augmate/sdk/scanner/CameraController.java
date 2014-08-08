@@ -26,6 +26,10 @@ class CameraController {
         assert (camera == null);
 
         int numOfCameras = Camera.getNumberOfCameras();
+        Log.debug("There are %d cameras available", numOfCameras);
+
+        assert(numOfCameras > 0);
+
         Camera.CameraInfo cameraInfo = new Camera.CameraInfo();
         for (int i = 0; i < numOfCameras; i++) {
             Camera.getCameraInfo(i, cameraInfo);
