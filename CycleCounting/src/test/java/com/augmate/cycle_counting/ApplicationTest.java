@@ -1,4 +1,4 @@
-package com.augmate.cycle_counting;
+package com.augmate.cyclecounting;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;
