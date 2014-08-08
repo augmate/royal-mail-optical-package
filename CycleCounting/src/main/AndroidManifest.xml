@@ -20,6 +20,7 @@
                        android:resource="@xml/voice_triggers" />
             </intent-filter>
         </activity>
+        <activity android:name="com.augmate.sdk.scanner.ScannerPlaceholder" />
     </application>
 
 </manifest>
