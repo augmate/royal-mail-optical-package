@@ -6,7 +6,6 @@ import android.os.Message;
 import com.augmate.sdk.logger.Log;
 import com.augmate.sdk.scanner.decoding.Decoder;
 import com.augmate.sdk.scanner.decoding.DecodingJob;
-import com.augmate.sdk.scanner.decoding.IBarcodeDecoder;
 
 import java.util.concurrent.CountDownLatch;
 
