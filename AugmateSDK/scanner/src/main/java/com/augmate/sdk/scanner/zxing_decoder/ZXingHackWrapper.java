@@ -9,12 +9,8 @@ import com.augmate.sdk.scanner.decoding.BarcodeResult;
 import com.augmate.sdk.scanner.decoding.DecodingJob;
 import com.google.zxing.NotFoundException;
 
-public class ZXingWrapper implements IBarcodeScannerWrapper {
+public class ZXingHackWrapper implements IBarcodeScannerWrapper {
     protected static byte[] binaryMatrix = new byte[0];
-
-    public ZXingWrapper() {
-
-    }
 
     @Override
     public void process(DecodingJob job) {

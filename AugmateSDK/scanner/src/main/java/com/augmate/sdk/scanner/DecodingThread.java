@@ -46,18 +46,18 @@ final class DecodingThread extends Thread {
         messagePump = new DecodingThreadMessages();
         isMsgPumpReady.countDown(); // release latch, allowing msg pump to be used by other threads
         Looper.loop();
-        Log.debug("Exiting thread.");
+        Log.debug("Exiting decoding thread.");
     }
 
     private void shutdown() {
         Log.debug("Shutting down message pump..");
+        // remove any queued messages
+        messagePump.removeMessages(R.id.scannerFragmentJobCompleted);
         // fun fact: messagePump.getLooper() is identical to Looper.myLooper()
-        messagePump.broadcastFinishedJobs = false;
         messagePump.getLooper().quit();
     }
 
     private final class DecodingThreadMessages extends Handler {
-        public boolean broadcastFinishedJobs = true;
         private Decoder decoder = new Decoder();
 
         @Override
@@ -77,11 +77,9 @@ final class DecodingThread extends Thread {
 
             Log.debug("Decoder completed job");
 
-            if (broadcastFinishedJobs) {
-                producerThreadHandler
-                        .obtainMessage(R.id.scannerFragmentJobCompleted, job)
-                        .sendToTarget();
-            }
+            producerThreadHandler
+                    .obtainMessage(R.id.scannerFragmentJobCompleted, job)
+                    .sendToTarget();
         }
     }
 }

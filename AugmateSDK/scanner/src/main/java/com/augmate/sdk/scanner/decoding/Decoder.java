@@ -1,9 +1,9 @@
 package com.augmate.sdk.scanner.decoding;
 
 import com.augmate.sdk.scanner.scandit_decoder.Configuration;
-import com.augmate.sdk.scanner.scandit_decoder.ScanditWrapper;
 import com.augmate.sdk.scanner.zxing_decoder.IBarcodeScannerWrapper;
-import com.augmate.sdk.scanner.zxing_decoder.ZXingWrapper;
+import com.augmate.sdk.scanner.zxing_decoder.ZXingHackWrapper;
+import com.augmate.sdk.scanner.zxing_decoder.ZXingOriginalQrOnlyWrapper;
 
 /**
  * Barcode decoding critical paths start here
@@ -16,7 +16,8 @@ public class Decoder {
 
     public Decoder() {
         //barcodeScanner = new ScanditWrapper(ScanditConfiguration);
-        barcodeScanner = new ZXingWrapper();
+        //barcodeScanner = new ZXingHackWrapper();
+        barcodeScanner = new ZXingOriginalQrOnlyWrapper();
     }
 
     public void process(DecodingJob job) {
