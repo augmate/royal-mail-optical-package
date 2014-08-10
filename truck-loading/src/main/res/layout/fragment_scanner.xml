@@ -23,7 +23,10 @@
     <!-- optional debugger overlay to visual scanner's activity -->
     <com.augmate.sdk.scanner.ScannerVisualDebugger
         android:id="@+id/scanner_visual_debugger"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:minWidth="640dp"
+        android:minHeight="360dp" />
 
 </FrameLayout>

@@ -84,11 +84,17 @@ class CameraController {
         }
 
         camera.startSmoothZoom(14);
+
+        Log.debug("Started camera frame-grabbing.");
     }
 
+    /**
+     * safe to call multiple times
+     */
     public void endFrameCapture() {
         if(camera != null) {
             Log.debug("Stopping camera frame-grabbing");
+            camera.setPreviewCallbackWithBuffer(null);
             camera.stopPreview();
             camera.release();
             camera = null;
@@ -164,16 +170,16 @@ class CameraController {
                 params.setPreviewSize(previewFrameWidth, previewFrameHeight);
                 break;
             case "Emulator":
-                Log.debug("Emulator run");
+                Log.debug("Optimizing for known emulator");
 
                 params.setAutoExposureLock(false);
                 params.setAutoWhiteBalanceLock(false);
 
-                params.set("manual-exposure", 0);
-                params.set("contrast", 80);
-                params.set("zoom", 10);
-                params.set("video-stabilization", 80);
-                params.set("whitebalance", "warm-fluorescent");
+                //params.set("manual-exposure", 0);
+                //params.set("contrast", 80);
+                //params.set("zoom", 10);
+                //params.set("video-stabilization", 80);
+                //params.set("whitebalance", "warm-fluorescent");
 
                 params.setPreviewFormat(ImageFormat.NV21);
                 params.setPreviewFpsRange(30000, 30000);
@@ -181,8 +187,13 @@ class CameraController {
 
                 break;
             default:
-                Log.debug("Unrecognized device run");
+                Log.debug("Optimizing for an unrecognized device (keeping it generic)");
 
+                params.setAutoWhiteBalanceLock(false);
+                params.setAutoExposureLock(false);
+                params.setFocusMode(Camera.Parameters.FOCUS_MODE_MACRO);
+                params.setSceneMode(Camera.Parameters.SCENE_MODE_BARCODE);
+                params.setPreviewFormat(ImageFormat.NV21);
                 params.setPreviewSize(previewFrameWidth, previewFrameHeight);
                 break;
         }

@@ -3,6 +3,7 @@ package com.augmate.sdk.scanner.scandit_decoder;
 import android.os.Build;
 import com.augmate.sdk.logger.Log;
 import com.augmate.sdk.logger.What;
+import com.augmate.sdk.scanner.decoding.BarcodeResult;
 import com.augmate.sdk.scanner.decoding.DecodingJob;
 import com.augmate.sdk.scanner.zxing_decoder.IBarcodeScannerWrapper;
 import com.mirasense.scanditsdk.ScanditSDKBarcodeReader;
@@ -28,61 +29,8 @@ public class ScanditWrapper implements IBarcodeScannerWrapper {
         reader.setEnable2dRecognition(true);
     }
 
-    @Override
-    public void process(DecodingJob job) {
-        byte[] data = job.getLuminance();
-        int width = job.getWidth();
-        int height = job.getHeight();
-
-        job.decodeStartedAt = What.timey();
-
-        Log.debug("asking scandit to processImage()..");
-        reader.processImage(data, width * height, width, height);
-        Log.debug("asking scandit to processImage().. Done");
-
-        byte[][] results = reader.fetchResults();
-
-        if(results != null) {
-            if(results.length > 0) {
-                Log.debug("result set has %d items", results.length);
-
-                for(byte[] fetchedBytes : results) {
-                    Log.debug("  item bytes = " + fetchedBytes);
-                    if(fetchedBytes == null)
-                        continue;
-                    String fetchedResult = new String(fetchedBytes);
-                    String[] barcodeStr = getCodeAndSymbology(fetchedResult);
-
-                    Log.debug("    -> fetchedResult: [%s]", fetchedResult);
-                    if(barcodeStr != null && barcodeStr.length >= 2)
-                        Log.debug("    -> barcodeStr: [%s] [%s]", barcodeStr[0], barcodeStr[1]);
-                }
-            }
-        } else {
-            Log.debug("got null results list");
-        }
-
-        if(reader.getCodeCenter() != null) {
-            int[] center = reader.getCodeCenter();
-            int[] locationSize = reader.getCodeSize();
-
-            int x = center[0];
-            int y = center[1];
-
-            int sizeX = locationSize[0];
-            int sizeY = locationSize[1];
-
-            int confidence = reader.getCodeConfidence();
-
-            Log.debug("found code center center: %d,%d  size: %d,%d  confidence: %d", x, y, sizeX, sizeY, confidence);
-        }
-
-        job.binarizationAt = What.timey();
-        job.decodeCompletedAt = What.timey();
-    }
-
-    private static String[] getCodeAndSymbology(String concatString)
-    {
+    // straight out of scandit.
+    private static String[] getCodeAndSymbology(String concatString) {
         if ((concatString == null) || (concatString.trim().length() == 0)) {
             return null;
         }
@@ -95,5 +43,70 @@ public class ScanditWrapper implements IBarcodeScannerWrapper {
         result[1] = concatString.substring(i + 11).trim();
 
         return result;
+    }
+
+    @Override
+    public void process(DecodingJob job) {
+        byte[] data = job.getLuminance();
+        int width = job.getWidth();
+        int height = job.getHeight();
+
+        job.decodeStartedAt = What.timey();
+
+        //Log.debug("asking scandit to processImage()..");
+        reader.processImage(data, width * height, width, height);
+        //Log.debug("asking scandit to processImage().. Done");
+
+        byte[][] results = reader.fetchResults();
+
+        String bestResultValue = null;
+        BarcodeResult.Format bestResultFormat = BarcodeResult.Format.UNKNOWN;
+
+        job.result.confidence = 0;
+
+        // this is fugly
+        if (results != null) {
+            if (results.length > 0) {
+                Log.debug("result set has %d items", results.length);
+
+                for (byte[] fetchedBytes : results) {
+                    //Log.debug("  item bytes = " + fetchedBytes);
+                    if (fetchedBytes == null)
+                        continue;
+                    String fetchedResult = new String(fetchedBytes);
+                    String[] barcodeStr = getCodeAndSymbology(fetchedResult);
+
+                    Log.debug("    -> fetchedResult: [%s]", fetchedResult);
+
+                    if (barcodeStr != null && barcodeStr.length >= 2) {
+                        Log.debug("    -> barcodeStr: [%s] [%s]", barcodeStr[0], barcodeStr[1]);
+                        bestResultValue = barcodeStr[0];
+                        if (barcodeStr[1] == "QR")
+                            bestResultFormat = BarcodeResult.Format.QRCode;
+                    }
+                }
+            }
+        } else {
+            Log.debug("got null results list");
+        }
+
+        if (reader.getCodeCenter() != null) {
+            int[] center = reader.getCodeCenter();
+            int[] locationSize = reader.getCodeSize();
+
+            job.result.setAABB(center[0], center[1], locationSize[0], locationSize[1]);
+
+            // confidence of 5 = barcode decoded
+            // values of 1 and 2 = sees something that might be a barcode
+            // value of 0 or -1 = nothing in the image worth looking at
+            job.result.confidence = Math.min(5, Math.max(0, reader.getCodeConfidence() / 5));
+            job.result.value = bestResultValue;
+            job.result.format = bestResultFormat;
+            job.result.timestamp = What.timey();
+
+            Log.debug("found code center center: %d,%d  size: %d,%d  confidence: %d", center[0], center[1], locationSize[0], locationSize[1], reader.getCodeConfidence());
+        }
+
+        job.decodeCompletedAt = What.timey();
     }
 }

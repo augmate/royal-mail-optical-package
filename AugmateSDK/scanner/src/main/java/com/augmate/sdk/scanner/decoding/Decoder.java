@@ -5,17 +5,18 @@ import com.augmate.sdk.scanner.scandit_decoder.ScanditWrapper;
 import com.augmate.sdk.scanner.zxing_decoder.IBarcodeScannerWrapper;
 import com.augmate.sdk.scanner.zxing_decoder.ZXingWrapper;
 
+/**
+ * Barcode decoding critical paths start here
+ * must work outside of android in a standalone java CLI app
+ */
 public class Decoder {
     IBarcodeScannerWrapper barcodeScanner;
 
     public static Configuration ScanditConfiguration;
 
     public Decoder() {
-        barcodeScanner = new ScanditWrapper(ScanditConfiguration);
-        //barcodeScanner = new ZXingWrapper();
-
-        // this is me typing out a comment and its causing the cpu utilization of the application to shoot up to over 100%
-        // which is kind of crazy because im not doing all that much at all..
+        //barcodeScanner = new ScanditWrapper(ScanditConfiguration);
+        barcodeScanner = new ZXingWrapper();
     }
 
     public void process(DecodingJob job) {

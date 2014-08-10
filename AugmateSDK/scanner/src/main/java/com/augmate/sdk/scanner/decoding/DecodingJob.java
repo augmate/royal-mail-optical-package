@@ -1,7 +1,6 @@
 package com.augmate.sdk.scanner.decoding;
 
 import android.os.SystemClock;
-import com.google.zxing.Result;
 
 public class DecodingJob {
 
@@ -13,12 +12,14 @@ public class DecodingJob {
     public final long requestedAt;
 
     // filled out by decoder (consumer)
-    public long decodeCompletedAt;
-    public long binarizationAt;
+    // TODO: this should be decoder-specific (zxing is more transparent than scandit)
     public long decodeStartedAt;
-    // TODO: public Result result;
+    public long binarizationAt;
+    public long locatingAt;
+    public long parsingAt;
+    public long decodeCompletedAt;
 
-    public Result result;
+    public BarcodeResult result = new BarcodeResult();
 
     public DecodingJob(int width, int height, byte[] luminance, int[] debugOutputBuffer) {
         this.width = width;
@@ -29,7 +30,7 @@ public class DecodingJob {
     }
 
     public long binarizationDuration() {
-        return decodeCompletedAt - binarizationAt;
+        return locatingAt - binarizationAt;
     }
 
     public long totalDuration() {
@@ -54,5 +55,9 @@ public class DecodingJob {
 
     public int[] getDebugOutputBuffer() {
         return debugOutputBuffer;
+    }
+
+    public long localizationDuration() {
+        return parsingAt - locatingAt;
     }
 }

@@ -8,9 +8,14 @@ import android.view.ViewGroup;
 import com.augmate.sdk.scanner.ScannerFragmentBase;
 import com.augmate.sdk.scanner.ScannerVisualDebugger;
 
+/**
+ * Note about extending ScannerFragmentBase:
+ * When overriding methods, make sure to call their base versions
+ * Specifically: onPause, onResume, onAttach, onDetach
+ */
 public class CustomScannerFragment extends ScannerFragmentBase {
     @Override
-    public View configureFragment(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_scanner, container, false);
 
         ScannerVisualDebugger dbg = (ScannerVisualDebugger) view.findViewById(R.id.scanner_visual_debugger);

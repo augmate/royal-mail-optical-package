@@ -1,61 +1,36 @@
 package com.augmate.sdk.scanner;
 
 import android.app.Activity;
+import android.graphics.Point;
 import android.hardware.Camera;
-import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.Fragment;
-import android.view.*;
+import android.view.SurfaceHolder;
+import android.view.SurfaceView;
 import com.augmate.sdk.logger.Log;
 import com.augmate.sdk.scanner.decoding.DecodingJob;
-import com.google.zxing.ResultPoint;
 
 public abstract class ScannerFragmentBase extends Fragment implements SurfaceHolder.Callback, Camera.PreviewCallback {
-    private ScannerVisualDebugger debugger;
-    private OnScannerResultListener mListener;
-    private SurfaceView surfaceView;
+    int framesSkipped = 0;
+    private FramebufferSettings frameBufferSettings = new FramebufferSettings(1280, 720);
     private CameraController cameraController = new CameraController();
     private boolean isProcessingCapturedFrames;
-    private DecodeThread decodingThread;
+    private OnScannerResultListener mListener;
     private boolean readyForNextFrame = true;
-    private FramebufferSettings frameBufferSettings = new FramebufferSettings(1280, 720);
-
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-
-        Log.debug("Activity created on thread=%d", Thread.currentThread().getId());
-
-        // spawn a decoding thread and connect it to our message pump
-        decodingThread = new DecodeThread(new MsgHandler(this));
-        decodingThread.start();
-    }
+    private ScannerVisualDebugger debugger;
+    private DecodingThread decodingThread;
+    private SurfaceView surfaceView;
 
     /**
-     * Override this method in your own fragment, just don't forget to call setupScannerActivity
-     * @param inflater
-     * @param container
-     * @param savedInstanceState
-     * @return
+     * Must call this method from a place like onCreateView() for the scanner to work
+     *
+     * @param surfaceView           SurfaceView is required
+     * @param scannerVisualDebugger ScannerVisualDebugger is optional
      */
-    @Override
-    public final View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.scanner_viz_fragment, container, false);
-
-        ScannerVisualDebugger dbg = (ScannerVisualDebugger) view.findViewById(R.id.scanner_visual_debugger);
-        SurfaceView sv = (SurfaceView) view.findViewById(R.id.camera_preview);
-
-        setupScannerActivity(sv, dbg);
-
-        Log.debug("Default Scanner Activity created.");
-
-        return view;
-    }
-
-    public abstract View configureFragment(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState);
-
     public void setupScannerActivity(SurfaceView surfaceView, ScannerVisualDebugger scannerVisualDebugger) {
+        Log.debug("Configuring scanner fragment.");
+
         this.surfaceView = surfaceView;
         this.debugger = scannerVisualDebugger;
     }
@@ -74,6 +49,8 @@ public abstract class ScannerFragmentBase extends Fragment implements SurfaceHol
         holder.removeCallback(this);
         holder.addCallback(this);
         isProcessingCapturedFrames = true;
+
+        startDecodingThread();
     }
 
     @Override
@@ -81,6 +58,12 @@ public abstract class ScannerFragmentBase extends Fragment implements SurfaceHol
         super.onPause();
         Log.debug("Paused");
         isProcessingCapturedFrames = false;
+
+        // stop camera frame-grab immediately, let go of preview-surface, and release camera
+        cameraController.endFrameCapture();
+
+        // stop decoding thread
+        shutdownDecodingThread();
     }
 
     public void onScannerSuccess(String data) {
@@ -102,24 +85,41 @@ public abstract class ScannerFragmentBase extends Fragment implements SurfaceHol
 
     @Override
     public void onDetach() {
-        Log.debug("Detached");
+        Log.debug("Detached. Shutting down decoding thread.");
         super.onDetach();
         mListener = null;
+    }
 
-        // shutdown
-        decodingThread.getMsgPump()
-                .obtainMessage(R.id.stopDecodingThread)
-                .sendToTarget();
-
-        Log.debug("Joining decoding-thread..");
-
-        try {
-            decodingThread.join(5000);
-        } catch (InterruptedException e) {
-            Log.exception(e, "Interrupted while waiting on decoding thread");
+    private void startDecodingThread() {
+        if(decodingThread == null) {
+            // spawn a decoding thread and connect it to our message pump
+            decodingThread = new DecodingThread(new ScannerFragmentMessages(this));
+            decodingThread.start();
         }
+    }
 
-        Log.debug("Decoding-thread has been shutdown.");
+    private void shutdownDecodingThread() {
+
+        if (decodingThread != null) {
+            // shutdown
+
+            Log.debug("Asking message pump to exit..");
+
+            decodingThread.getMessagePump()
+                    .obtainMessage(R.id.decodingThreadShutdown)
+                    .sendToTarget();
+
+            Log.debug("Waiting on decoding-thread to exit (timeout: 5s)");
+
+            try {
+                decodingThread.join(5000);
+            } catch (InterruptedException e) {
+                Log.exception(e, "Interrupted while waiting on decoding thread");
+            }
+
+            decodingThread = null;
+            Log.debug("Decoding-thread has been shutdown.");
+        }
     }
 
     @Override
@@ -160,14 +160,17 @@ public abstract class ScannerFragmentBase extends Fragment implements SurfaceHol
             // kick-off frame decoding in a dedicated thread
             DecodingJob job = new DecodingJob(frameBufferSettings.width, frameBufferSettings.height, bytes, debugger.getNextDebugBuffer());
 
-            decodingThread.getMsgPump()
-                    .obtainMessage(R.id.newDecodeJob, job)
+            decodingThread.getMessagePump()
+                    .obtainMessage(R.id.decodingThreadNewJob, job)
                     .sendToTarget();
 
             // change capture-buffer to prevent camera from modifying buffer sent to decoder
             // this avoids copying buffers on every frame
             cameraController.changeFrameBuffer();
             readyForNextFrame = false;
+            framesSkipped = 0;
+        } else {
+            framesSkipped++;
         }
 
         // queue up next frame for capture
@@ -175,13 +178,13 @@ public abstract class ScannerFragmentBase extends Fragment implements SurfaceHol
     }
 
     private void onDecodeCompleted(DecodingJob job) {
-        Log.debug("Decoded; queue-overhead=%d msec, binarization=%d msec, total=%d msec", job.queueDuration(), job.binarizationDuration(), job.totalDuration());
+        Log.debug("Decoded; skipped frames=%d, binarization=%d msec, localization=%d msec, total=%d msec", framesSkipped, job.binarizationDuration(), job.localizationDuration(), job.totalDuration());
 
-        if (job.result != null) {
-            ResultPoint[] pts = job.result.getResultPoints();
-            Log.info("Found qr code points: (%.1f,%.1f) (%.1f,%.1f) (%.1f,%.1f)", pts[0].getX(), pts[0].getY(), pts[1].getX(), pts[1].getY(), pts[2].getX(), pts[2].getY());
-
-            //job.result.getText()
+        if (job.result != null && job.result.confidence > 0) {
+            Point[] pts = job.result.corners;
+            //Log.info("  Found barcode corners: (%d,%d) (%d,%d) (%d,%d)", pts[0].x, pts[0].y, pts[1].x, pts[1].y, pts[2].x, pts[2].y);
+            debugger.setPoints(pts);
+            debugger.setBarcodeValue(job.result.value);
         }
 
         // tell debugger they can use the buffer we wrote decoding debug data to
@@ -193,6 +196,10 @@ public abstract class ScannerFragmentBase extends Fragment implements SurfaceHol
         // may reduce delays by length of one frame (ie 50ms at 20fps)
     }
 
+    /**
+     * Provides barcode decoding results to a parent Activity (on its own thread)
+     * Must be implemented by parent Activity
+     */
     public interface OnScannerResultListener {
         public void onBarcodeScanSuccess(String result);
     }
@@ -207,28 +214,23 @@ public abstract class ScannerFragmentBase extends Fragment implements SurfaceHol
         }
     }
 
-    // handles messages pushed into parent activity's thread
-    public final class MsgHandler extends Handler {
-        private ScannerFragmentBase parent;
+    /**
+     * pushes messages into activity thread from the decoder thread
+     */
+    public final class ScannerFragmentMessages extends Handler {
+        private ScannerFragmentBase fragment;
 
-        MsgHandler(ScannerFragmentBase parent) {
-            this.parent = parent;
+        ScannerFragmentMessages(ScannerFragmentBase fragment) {
+            this.fragment = fragment;
             Log.debug("Msg Pump created on thread=%d", Thread.currentThread().getId());
         }
 
         @Override
         public void handleMessage(Message msg) {
             //Log.debug("On thread=%d got msg=%d", Thread.currentThread().getId(), msg.what);
-            if (msg.what == R.id.decodeJobCompleted) {
-                parent.onDecodeCompleted((DecodingJob) msg.obj);
+            if (msg.what == R.id.scannerFragmentJobCompleted) {
+                fragment.onDecodeCompleted((DecodingJob) msg.obj);
             }
-        }
-
-        // push decode message job into a different thread
-        public void queueDecodeJob(DecodingJob job) {
-            decodingThread.getMsgPump()
-                    .obtainMessage(R.id.newDecodeJob, job)
-                    .sendToTarget();
         }
     }
 }
