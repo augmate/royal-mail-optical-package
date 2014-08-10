@@ -11,7 +11,7 @@
 
     <fragment
         android:id="@+id/scanner_visualization"
-        android:name="com.augmate.sdk.scanner.ScannerVisualization"
+        android:name="com.augmate.sdk.scanner.ScannerFragmentBase"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:layout="@layout/scanner_viz_fragment" />

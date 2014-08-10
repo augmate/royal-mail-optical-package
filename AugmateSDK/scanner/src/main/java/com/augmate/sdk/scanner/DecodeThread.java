@@ -4,8 +4,9 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import com.augmate.sdk.logger.Log;
-import com.augmate.sdk.scanner.decoding.DecoderQR;
+import com.augmate.sdk.scanner.decoding.Decoder;
 import com.augmate.sdk.scanner.decoding.DecodingJob;
+import com.augmate.sdk.scanner.decoding.IBarcodeDecoder;
 
 import java.util.concurrent.CountDownLatch;
 
@@ -52,7 +53,7 @@ final class DecodeThread extends Thread {
     }
 
     private final class DecodeThreadHandler extends Handler {
-        private DecoderQR decoder = new DecoderQR();
+        private Decoder decoder = new Decoder();
 
         @Override
         public void handleMessage(Message msg) {

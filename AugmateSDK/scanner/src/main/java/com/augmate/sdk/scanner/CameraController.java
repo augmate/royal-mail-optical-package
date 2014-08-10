@@ -30,17 +30,21 @@ class CameraController {
 
         assert(numOfCameras > 0);
 
+        int bestCameraIdx = 0;
         Camera.CameraInfo cameraInfo = new Camera.CameraInfo();
         for (int i = 0; i < numOfCameras; i++) {
             Camera.getCameraInfo(i, cameraInfo);
             Log.debug("  Camera #%d facing=%d orientation=%d", i, cameraInfo.facing, cameraInfo.orientation);
+            if(cameraInfo.facing == Camera.CameraInfo.CAMERA_FACING_BACK) {
+                bestCameraIdx = i;
+            }
         }
 
         Log.ScopeTimer cameraTimer = Log.startTimer("Opening camera took %d msec");
 
         // try to open the first available camera
         try {
-            camera = Camera.open();
+            camera = Camera.open(bestCameraIdx);
             camera.setErrorCallback(new Camera.ErrorCallback() {
                 @Override
                 public void onError(int i, Camera camera) {

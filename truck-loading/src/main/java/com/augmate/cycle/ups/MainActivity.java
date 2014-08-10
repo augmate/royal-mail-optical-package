@@ -5,7 +5,10 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import com.augmate.sdk.logger.Log;
-import com.augmate.sdk.scanner.ScannerPlaceholder;
+import com.augmate.sdk.scanner.decoding.Decoder;
+import com.augmate.sdk.scanner.scandit_decoder.Configuration;
+
+import java.io.File;
 
 public class MainActivity extends Activity {
     PowerHelper powerHelper = new PowerHelper(this);
@@ -22,7 +25,7 @@ public class MainActivity extends Activity {
 //        startActivity(intent);
 
         // or spawn optical scanner
-        Intent intent = new Intent(this, ScannerPlaceholder.class);
+        Intent intent = new Intent(this, BoxScannerActivity.class);
         startActivity(intent);
 
         finish();

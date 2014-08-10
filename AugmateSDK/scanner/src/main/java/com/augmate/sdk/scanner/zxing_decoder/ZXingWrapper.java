@@ -10,11 +10,15 @@ import com.google.zxing.NotFoundException;
 import com.google.zxing.Result;
 import com.google.zxing.ResultPoint;
 
-public class ZXingWrapper {
+public class ZXingWrapper implements IBarcodeScannerWrapper {
+    protected static byte[] binaryMatrix = new byte[0];
 
-    public static byte[] binaryMatrix = new byte[0];
+    public ZXingWrapper() {
 
-    public static void process(DecodingJob job) {
+    }
+
+    @Override
+    public void process(DecodingJob job) {
         byte[] data = job.getLuminance();
         int width = job.getWidth();
         int height = job.getHeight();

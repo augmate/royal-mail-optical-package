@@ -1,28 +1,14 @@
-package com.augmate.sdk.scanner;
+package com.augmate.cycle.ups;
 
 import android.os.Bundle;
-import android.os.SystemClock;
 import android.support.v4.app.FragmentActivity;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import com.augmate.sdk.logger.Log;
+import com.augmate.sdk.scanner.ScannerFragmentBase;
 
-public class ScannerPlaceholder extends FragmentActivity implements ScannerFragmentBase.OnScannerResultListener {
-
-    public void testNativePath() {
-        Log.debug("I'm a little scanner short and stout.");
-
-        byte[] src = new byte[1920 * 1200 * 4];
-        int[] dst = new int[1920 * 1200];
-
-        long start = SystemClock.elapsedRealtime();
-
-        NativeUtils.binarizeToIntBuffer(src, dst, 1920, 1200);
-
-        long span = SystemClock.elapsedRealtime() - start;
-        Log.debug("Binarizer took: %d msec", span);
-    }
+public class BoxScannerActivity extends FragmentActivity implements ScannerFragmentBase.OnScannerResultListener {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,9 +19,9 @@ public class ScannerPlaceholder extends FragmentActivity implements ScannerFragm
         getWindow().requestFeature(Window.FEATURE_NO_TITLE);
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
 
-        setContentView(R.layout.scanner_activity);
+        setContentView(R.layout.activity_scan_box);
 
-        Log.debug("Created scanner activity");
+        Log.debug("Created activity that uses barcode scanner");
     }
 
     @Override

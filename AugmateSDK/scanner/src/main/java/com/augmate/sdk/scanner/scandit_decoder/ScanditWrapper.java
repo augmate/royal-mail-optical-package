@@ -1,40 +1,35 @@
 package com.augmate.sdk.scanner.scandit_decoder;
 
-import android.content.Context;
 import android.os.Build;
-import android.provider.Settings;
 import com.augmate.sdk.logger.Log;
 import com.augmate.sdk.logger.What;
 import com.augmate.sdk.scanner.decoding.DecodingJob;
+import com.augmate.sdk.scanner.zxing_decoder.IBarcodeScannerWrapper;
 import com.mirasense.scanditsdk.ScanditSDKBarcodeReader;
 
 // all reader interaction reversed out of scandit sdk
 
-public class ScanditWrapper {
-    public static ScanditSDKBarcodeReader reader;
+public class ScanditWrapper implements IBarcodeScannerWrapper {
+    protected ScanditSDKBarcodeReader reader;
 
-    public static void initializeScandit(Context ctx) {
+    public ScanditWrapper(Configuration cfg) {
         reader = new ScanditSDKBarcodeReader();
         String appKey = "r5Zv3MXCEeOFwbn5ZXY54sJhMiM33cd/9czhbX62fmA";
 
-        String platformAppId = ctx.getPackageName();
-        String deviceId = Settings.Secure.getString(ctx.getContentResolver(), "android_id");
-        if ((deviceId == null) || (deviceId.length() < 16)) {
-            deviceId = "0000000000000000";
-        }
-        reader.setLegacyDeviceId(SbSystemUtils.sha1Digest(deviceId));
-        reader.setDeviceId(SbSystemUtils.sha1Digest(deviceId));
+        reader.setLegacyDeviceId(SbSystemUtils.sha1Digest(cfg.deviceId));
+        reader.setDeviceId(SbSystemUtils.sha1Digest(cfg.deviceId));
         reader.setDeviceModel(Build.MODEL);
         reader.setPlatform("android");
         reader.setPlatformVersion(Build.VERSION.RELEASE);
         reader.setUsedFramework(ScanditSDKGlobals.usedFramework);
 
-        reader.initialize(ctx.getFilesDir());
-        reader.setupLicenseInformation(appKey, platformAppId);
+        reader.initialize(cfg.filesDir);
+        reader.setupLicenseInformation(appKey, cfg.platformAppId);
         reader.setEnable2dRecognition(true);
     }
 
-    public static void process(DecodingJob job) {
+    @Override
+    public void process(DecodingJob job) {
         byte[] data = job.getLuminance();
         int width = job.getWidth();
         int height = job.getHeight();
@@ -42,10 +37,10 @@ public class ScanditWrapper {
         job.decodeStartedAt = What.timey();
 
         Log.debug("asking scandit to processImage()..");
-        ScanditWrapper.reader.processImage(data, width * height, width, height);
+        reader.processImage(data, width * height, width, height);
         Log.debug("asking scandit to processImage().. Done");
 
-        byte[][] results = ScanditWrapper.reader.fetchResults();
+        byte[][] results = reader.fetchResults();
 
         if(results != null) {
             if(results.length > 0) {
@@ -67,9 +62,9 @@ public class ScanditWrapper {
             Log.debug("got null results list");
         }
 
-        if(ScanditWrapper.reader.getCodeCenter() != null) {
-            int[] center = ScanditWrapper.reader.getCodeCenter();
-            int[] locationSize = ScanditWrapper.reader.getCodeSize();
+        if(reader.getCodeCenter() != null) {
+            int[] center = reader.getCodeCenter();
+            int[] locationSize = reader.getCodeSize();
 
             int x = center[0];
             int y = center[1];
@@ -77,7 +72,7 @@ public class ScanditWrapper {
             int sizeX = locationSize[0];
             int sizeY = locationSize[1];
 
-            int confidence = ScanditWrapper.reader.getCodeConfidence();
+            int confidence = reader.getCodeConfidence();
 
             Log.debug("found code center center: %d,%d  size: %d,%d  confidence: %d", x, y, sizeX, sizeY, confidence);
         }

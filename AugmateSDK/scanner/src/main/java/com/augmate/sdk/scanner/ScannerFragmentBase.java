@@ -11,7 +11,7 @@ import com.augmate.sdk.logger.Log;
 import com.augmate.sdk.scanner.decoding.DecodingJob;
 import com.google.zxing.ResultPoint;
 
-public class ScannerVisualization extends Fragment implements SurfaceHolder.Callback, Camera.PreviewCallback {
+public abstract class ScannerFragmentBase extends Fragment implements SurfaceHolder.Callback, Camera.PreviewCallback {
     private ScannerVisualDebugger debugger;
     private OnScannerResultListener mListener;
     private SurfaceView surfaceView;
@@ -32,22 +32,43 @@ public class ScannerVisualization extends Fragment implements SurfaceHolder.Call
         decodingThread.start();
     }
 
+    /**
+     * Override this method in your own fragment, just don't forget to call setupScannerActivity
+     * @param inflater
+     * @param container
+     * @param savedInstanceState
+     * @return
+     */
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public final View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.scanner_viz_fragment, container, false);
 
-        debugger = (ScannerVisualDebugger) view.findViewById(R.id.scanner_visual_debugger);
-        surfaceView = (SurfaceView) view.findViewById(R.id.camera_preview);
+        ScannerVisualDebugger dbg = (ScannerVisualDebugger) view.findViewById(R.id.scanner_visual_debugger);
+        SurfaceView sv = (SurfaceView) view.findViewById(R.id.camera_preview);
 
-        Log.debug("View created?");
+        setupScannerActivity(sv, dbg);
+
+        Log.debug("Default Scanner Activity created.");
 
         return view;
+    }
+
+    public abstract View configureFragment(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState);
+
+    public void setupScannerActivity(SurfaceView surfaceView, ScannerVisualDebugger scannerVisualDebugger) {
+        this.surfaceView = surfaceView;
+        this.debugger = scannerVisualDebugger;
     }
 
     @Override
     public void onResume() {
         super.onResume();
         Log.debug("Resuming");
+
+        if (surfaceView == null) {
+            Log.error("surfaceView is null. Must setupScannerActivity() with a valid SurfaceView in onCreateView().");
+            return;
+        }
 
         SurfaceHolder holder = surfaceView.getHolder();
         holder.removeCallback(this);
@@ -104,13 +125,13 @@ public class ScannerVisualization extends Fragment implements SurfaceHolder.Call
     @Override
     public void surfaceCreated(SurfaceHolder surfaceHolder) {
         Log.debug("Surface has been created");
-        Log.debug("Surface has size of %d x %d", surfaceHolder.getSurfaceFrame().width(), surfaceHolder.getSurfaceFrame().height());
+        Log.debug("  Surface has size of %d x %d", surfaceHolder.getSurfaceFrame().width(), surfaceHolder.getSurfaceFrame().height());
     }
 
     @Override
     public void surfaceChanged(SurfaceHolder surfaceHolder, int i, int i2, int i3) {
         Log.debug("Surface has changed");
-        Log.debug("Surface has size of %d x %d", surfaceHolder.getSurfaceFrame().width(), surfaceHolder.getSurfaceFrame().height());
+        Log.debug("  Surface has size of %d x %d", surfaceHolder.getSurfaceFrame().width(), surfaceHolder.getSurfaceFrame().height());
 
         // configure debugging render-target
         debugger.setFrameBufferSettings(frameBufferSettings.width, frameBufferSettings.height);
@@ -136,8 +157,7 @@ public class ScannerVisualization extends Fragment implements SurfaceHolder.Call
         //Log.debug("New frame is available @ 0x%X", bytes.hashCode());
 
         if (readyForNextFrame) {
-            // kick-off processing in a different thread
-
+            // kick-off frame decoding in a dedicated thread
             DecodingJob job = new DecodingJob(frameBufferSettings.width, frameBufferSettings.height, bytes, debugger.getNextDebugBuffer());
 
             decodingThread.getMsgPump()
@@ -160,6 +180,8 @@ public class ScannerVisualization extends Fragment implements SurfaceHolder.Call
         if (job.result != null) {
             ResultPoint[] pts = job.result.getResultPoints();
             Log.info("Found qr code points: (%.1f,%.1f) (%.1f,%.1f) (%.1f,%.1f)", pts[0].getX(), pts[0].getY(), pts[1].getX(), pts[1].getY(), pts[2].getX(), pts[2].getY());
+
+            //job.result.getText()
         }
 
         // tell debugger they can use the buffer we wrote decoding debug data to
@@ -187,9 +209,9 @@ public class ScannerVisualization extends Fragment implements SurfaceHolder.Call
 
     // handles messages pushed into parent activity's thread
     public final class MsgHandler extends Handler {
-        private ScannerVisualization parent;
+        private ScannerFragmentBase parent;
 
-        MsgHandler(ScannerVisualization parent) {
+        MsgHandler(ScannerFragmentBase parent) {
             this.parent = parent;
             Log.debug("Msg Pump created on thread=%d", Thread.currentThread().getId());
         }
