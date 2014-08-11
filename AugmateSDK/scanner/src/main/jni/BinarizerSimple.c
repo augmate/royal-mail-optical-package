@@ -1,6 +1,4 @@
-#include <jni.h>
 #include <stdio.h>
-
 #include "Helpers.h"
 
 // manipulates an integer array

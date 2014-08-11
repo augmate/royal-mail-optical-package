@@ -25,6 +25,8 @@ public class ZXingHackWrapper implements IBarcodeScannerWrapper {
 
         job.binarizationAt = What.timey();
 
+        NativeUtils.zxingNativeDecode(data, width, height);
+
         NativeUtils.binarize(data, binaryMatrix, width, height);
         //NativeUtils.binarizeToIntBuffer(data, job.getDebugOutputBuffer(), width, height);
 

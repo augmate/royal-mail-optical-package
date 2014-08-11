@@ -1,8 +1,10 @@
 package com.augmate.sdk.scanner.decoding;
 
+import com.augmate.sdk.scanner.NativeUtils;
 import com.augmate.sdk.scanner.scandit_decoder.Configuration;
 import com.augmate.sdk.scanner.zxing_decoder.IBarcodeScannerWrapper;
 import com.augmate.sdk.scanner.zxing_decoder.ZXingHackWrapper;
+import com.augmate.sdk.scanner.zxing_decoder.ZXingNativeWrapper;
 import com.augmate.sdk.scanner.zxing_decoder.ZXingOriginalQrOnlyWrapper;
 
 /**
@@ -18,6 +20,7 @@ public class Decoder {
         //barcodeScanner = new ScanditWrapper(ScanditConfiguration);
         //barcodeScanner = new ZXingHackWrapper();
         barcodeScanner = new ZXingOriginalQrOnlyWrapper();
+        //barcodeScanner = new ZXingNativeWrapper();
     }
 
     public void process(DecodingJob job) {

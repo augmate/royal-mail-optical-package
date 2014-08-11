@@ -23,6 +23,14 @@ JNIEXPORT void JNICALL Java_com_augmate_sdk_scanner_NativeUtils_binarize
 JNIEXPORT void JNICALL Java_com_augmate_sdk_scanner_NativeUtils_binarizeToIntBuffer
   (JNIEnv *, jclass, jbyteArray, jintArray, jint, jint);
 
+/*
+ * Class:     com_augmate_sdk_scanner_NativeUtils
+ * Method:    zxingNativeDecode
+ * Signature: ([BII)V
+ */
+JNIEXPORT void JNICALL Java_com_augmate_sdk_scanner_NativeUtils_zxingNativeDecode
+  (JNIEnv *, jclass, jbyteArray, jint, jint);
+
 #ifdef __cplusplus
 }
 #endif

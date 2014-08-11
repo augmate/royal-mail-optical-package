@@ -1,3 +1,8 @@
+#ifndef __INCLUDE_HELPERS_H
+#define __INCLUDE_HELPERS_H
+
+#include <android/log.h>
+
 // define ABI
 #if defined(__arm__)
   #if defined(__ARM_ARCH_7A__)
@@ -15,4 +20,8 @@
    #define ABI "mips"
 #else
    #define ABI "unknown"
+#endif
+
+#define  LOGD(...)  __android_log_print(ANDROID_LOG_DEBUG, "Augmate.Native", __VA_ARGS__)
+
 #endif

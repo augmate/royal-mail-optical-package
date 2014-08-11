@@ -25,10 +25,16 @@ android {
         versionName '1.0'
 
         ndk {
+            String scannerDir = file('.').absolutePath
+
             moduleName "native-scanner"
-            // TODO: play with compilation flags
+            ldLibs "log -lzxing_android_x86_release -L" + scannerDir + "/libs/lib/x86/"
+            cFlags "-fexceptions -I" + scannerDir + "/includes/"
+            stl "gnustl_shared"
+            abiFilter "x86"
+
+            // TODO: play with optimization flags
             //cFlags "-march=armv7-a -mfloat-abi=softfp -mfpu=neon"
-            //dLibs "llog", "lz"
         }
     }
 
@@ -39,7 +45,8 @@ android {
 
     sourceSets {
         main {
-            jni.srcDirs = ['src/main/jni', 'libs']
+            jni.srcDirs = ['src/main/jni']
+            jniLibs.srcDirs = ['libs']
         }
 
         androidTest {
@@ -48,6 +55,11 @@ android {
     }
 
     buildTypes {
+        buildTypes {
+            debug {
+                jniDebugBuild true
+            }
+        }
         release {
             runProguard false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
@@ -63,9 +75,9 @@ android {
 
 task javah {
     ant.javah(
-            class: 'com.augmate.sdk.scanner.NativeUtils',
-            outputFile: 'src/main/jni/NativeUtils.h',
-            classpath: 'src/main/java'
+        class: 'com.augmate.sdk.scanner.NativeUtils',
+        outputFile: 'src/main/jni/NativeUtils.h',
+        classpath: 'src/main/java'
     )
 }
 
