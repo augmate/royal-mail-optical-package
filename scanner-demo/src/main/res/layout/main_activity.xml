@@ -69,6 +69,7 @@
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
             android:textSize="20dp"
+            android:textColor="#ffffff"
             android:id="@+id/lastBarcode"
             android:layout_marginTop="10dp"
             android:layout_marginLeft="20dp"

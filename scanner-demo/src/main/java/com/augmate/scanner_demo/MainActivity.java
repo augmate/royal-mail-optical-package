@@ -28,7 +28,6 @@ public class MainActivity extends Activity {
 
             // update result view
             ((TextView) findViewById(R.id.lastBarcode)).setText(value);
-
             findViewById(R.id.barcodeScanResultContainer).setVisibility(View.VISIBLE);
         } else {
             Log.debug("Got no barcode results");
@@ -47,15 +46,4 @@ public class MainActivity extends Activity {
 
         return super.onKeyDown(keyCode, event);
     }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-    }
-
 }
