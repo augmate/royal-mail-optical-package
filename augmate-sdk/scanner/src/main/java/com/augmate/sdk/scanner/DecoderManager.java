@@ -1,7 +1,6 @@
 package com.augmate.sdk.scanner;
 
 import com.augmate.sdk.scanner.decoder.DecodingJob;
-import com.augmate.sdk.scanner.decoder.scandit.Configuration;
 import com.augmate.sdk.scanner.decoder.zxing.IBarcodeScannerWrapper;
 import com.augmate.sdk.scanner.decoder.zxing.ZXingOriginalQrOnlyWrapper;
 
@@ -12,10 +11,7 @@ import com.augmate.sdk.scanner.decoder.zxing.ZXingOriginalQrOnlyWrapper;
 public class DecoderManager {
     IBarcodeScannerWrapper barcodeScanner;
 
-    public static Configuration ScanditConfiguration;
-
     public DecoderManager() {
-        //barcodeScanner = new ScanditWrapper(ScanditConfiguration); // native based Scandit
         //barcodeScanner = new ZXingHackWrapper(); // java based ZXing with native hacks
         barcodeScanner = new ZXingOriginalQrOnlyWrapper(); // tried and true completely Java based
         //barcodeScanner = new ZXingNativeWrapper(); // unsupported native ZXing port that we should fork and publicly contribute to

@@ -1,0 +1,44 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:keepScreenOn="true"
+                tools:context="${packageName}.${activityClass}">
+
+    <TextView
+        android:text="Tap to scan"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:textSize="30dp"
+        android:id="@+id/instructionText"
+        android:layout_marginTop="50dp" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_centerInParent="true"
+        android:gravity="center"
+        android:visibility="invisible"
+        android:id="@+id/barcodeScanResultContainer">
+
+        <TextView
+            android:text="last scanned value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:textSize="20dp"
+            android:id="@+id/textView"/>
+
+        <TextView
+            android:text="50"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:textSize="25dp"
+            android:id="@+id/lastBarcode"
+            android:layout_marginTop="10dp" />
+    </LinearLayout>
+
+</RelativeLayout>
