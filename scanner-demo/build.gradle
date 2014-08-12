@@ -35,9 +35,14 @@ android {
         targetCompatibility JavaVersion.VERSION_1_7
     }
     buildTypes {
+
         release {
             runProguard false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
+
+            // sign releases using debug key for now
+            signingConfig signingConfigs.debug
+            zipAlign true
         }
     }
 

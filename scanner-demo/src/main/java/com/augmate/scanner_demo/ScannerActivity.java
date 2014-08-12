@@ -14,6 +14,9 @@ public class ScannerActivity extends FragmentActivity implements ScannerFragment
         setContentView(R.layout.box_scan_activity);
 
         Log.debug("Created activity that uses barcode scanner");
+
+        // default result if we don't find a value with the barcode scanner
+        setResult(RESULT_CANCELED);
     }
 
     @Override

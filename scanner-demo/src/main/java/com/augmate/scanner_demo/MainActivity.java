@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.KeyEvent;
+import android.view.View;
 import android.view.WindowManager;
 import android.widget.TextView;
 import com.augmate.sdk.logger.Log;
@@ -21,14 +22,17 @@ public class MainActivity extends Activity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == 0x01) {
+        if (requestCode == 0x01 && resultCode == RESULT_OK) {
             String value = data.getStringExtra("barcodeString");
             Log.debug("Got barcode value=%s", value);
 
             // update result view
             ((TextView) findViewById(R.id.lastBarcode)).setText(value);
 
-            findViewById(R.id.barcodeScanResultContainer).setVisibility(1);
+            findViewById(R.id.barcodeScanResultContainer).setVisibility(View.VISIBLE);
+        } else {
+            Log.debug("Got no barcode results");
+            findViewById(R.id.barcodeScanResultContainer).setVisibility(View.INVISIBLE);
         }
     }
 
