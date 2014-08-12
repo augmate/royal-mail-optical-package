@@ -1,5 +1,5 @@
 <!--
-    Augmate Scanner - Customizable to your desire
+    Augmate Scanner - customize to your desire
     the only requirement here is the SurfaceView
         camera will render to the SurfaceView
         we grab frames off it and process it in a decoder engine
@@ -28,5 +28,12 @@
         android:layout_gravity="center"
         android:minWidth="640dp"
         android:minHeight="360dp" />
+
+    <TextView
+        android:text="Customizable Scanner Fragment"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp"
+        android:layout_gravity="bottom|right"/>
 
 </FrameLayout>

@@ -102,8 +102,6 @@ public class ScannerVisualDebugger extends View {
         boxLineColor.setAlpha((int)(barcodeConfidence * barcodeConfidence * 255));
         boxPointColor.setAlpha((int)(barcodeConfidence * 255));
 
-        canvas.drawRect(10, 10, 100, 100, generalPaint);
-
         if (debugImg != null) {
             canvas.drawBitmap(debugImg[currentDebugBufferIdx], 0, rawImgWidth, 0, 0, rawImgWidth, rawImgHeight, true, null);
         }

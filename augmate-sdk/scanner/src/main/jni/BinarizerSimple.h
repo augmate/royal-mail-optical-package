@@ -5,4 +5,3 @@ void binarizerSimpleByteToIntArray(unsigned char* src, unsigned int* dst, unsign
 void binarizerSimpleByteArray(unsigned char* src, unsigned char* dst, unsigned int width, unsigned int height);
 
 #endif __INCLUDE_BINARIZER_SIMPLE_H
-

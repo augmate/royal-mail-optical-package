@@ -5,7 +5,7 @@ import com.augmate.sdk.logger.Log;
 import com.augmate.sdk.scanner.decoder.Decoder;
 import com.augmate.sdk.scanner.decoder.scandit.Configuration;
 
-public class CycleUpsApplication extends Application {
+public class BoxCounterApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();

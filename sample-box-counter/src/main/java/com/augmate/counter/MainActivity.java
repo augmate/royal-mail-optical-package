@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.widget.TextView;
 import com.augmate.sdk.logger.Log;
 
 public class MainActivity extends Activity {
@@ -28,20 +29,22 @@ public class MainActivity extends Activity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if(requestCode == 0x01) {
-            Log.debug("Got resultCode=%d and barcode value=%s", resultCode, data.getExtras().getString("barcodeString"));
+            String value = data.getStringExtra("barcodeString");
+            Log.debug("Got barcode value=%s", value);
+            ((TextView)findViewById(R.id.lastBarcode)).setText(value);
         }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        powerHelper.wake();
+        //powerHelper.wake();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        powerHelper.release();
+        //powerHelper.release();
     }
 
 }

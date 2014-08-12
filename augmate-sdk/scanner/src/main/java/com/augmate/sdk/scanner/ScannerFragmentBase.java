@@ -17,7 +17,7 @@ public abstract class ScannerFragmentBase extends Fragment implements SurfaceHol
     private boolean isProcessingCapturedFrames;
     private OnScannerResultListener mListener;
     private boolean readyForNextFrame = true;
-    private ScannerVisualDebugger debugger;
+    private ScannerVisualDebugger dbgVisualizer;
     private DecodingThread decodingThread;
     private SurfaceView surfaceView;
     private int framesSkipped = 0;
@@ -32,7 +32,7 @@ public abstract class ScannerFragmentBase extends Fragment implements SurfaceHol
         Log.debug("Configuring scanner fragment.");
 
         this.surfaceView = surfaceView;
-        this.debugger = scannerVisualDebugger;
+        this.dbgVisualizer = scannerVisualDebugger;
     }
 
     @Override
@@ -79,7 +79,7 @@ public abstract class ScannerFragmentBase extends Fragment implements SurfaceHol
 
     @Override
     public void onDetach() {
-        Log.debug("Detached. Shutting down decoding thread.");
+        Log.debug("Detached");
         super.onDetach();
         mListener = null;
     }
@@ -128,7 +128,8 @@ public abstract class ScannerFragmentBase extends Fragment implements SurfaceHol
         Log.debug("  Surface has size of %d x %d", surfaceHolder.getSurfaceFrame().width(), surfaceHolder.getSurfaceFrame().height());
 
         // configure debugging render-target
-        debugger.setFrameBufferSettings(frameBufferSettings.width, frameBufferSettings.height);
+        if(dbgVisualizer != null)
+            dbgVisualizer.setFrameBufferSettings(frameBufferSettings.width, frameBufferSettings.height);
 
         // configure camera frame-grabbing
         cameraController.endFrameCapture();
@@ -152,7 +153,7 @@ public abstract class ScannerFragmentBase extends Fragment implements SurfaceHol
 
         if (readyForNextFrame) {
             // kick-off frame decoding in a dedicated thread
-            DecodingJob job = new DecodingJob(frameBufferSettings.width, frameBufferSettings.height, bytes, debugger.getNextDebugBuffer());
+            DecodingJob job = new DecodingJob(frameBufferSettings.width, frameBufferSettings.height, bytes, dbgVisualizer != null ? dbgVisualizer.getNextDebugBuffer() : null);
 
             decodingThread.getMessagePump()
                     .obtainMessage(R.id.decodingThreadNewJob, job)
@@ -171,14 +172,17 @@ public abstract class ScannerFragmentBase extends Fragment implements SurfaceHol
         cameraController.requestAnotherFrame();
     }
 
-    private void onDecodeCompleted(DecodingJob job) {
-        Log.debug("Decoded; skipped frames=%d, binarization=%d msec, localization=%d msec, total=%d msec", framesSkipped, job.binarizationDuration(), job.localizationDuration(), job.totalDuration());
+    private void onJobCompleted(DecodingJob job) {
+        Log.debug("Job stats: skipped frames=%d, binarization=%d msec, total=%d msec", framesSkipped, job.binarizationDuration(), job.totalDuration());
 
         if (job.result != null && job.result.confidence > 0) {
             Point[] pts = job.result.corners;
-            //Log.info("  Found barcode corners: (%d,%d) (%d,%d) (%d,%d)", pts[0].x, pts[0].y, pts[1].x, pts[1].y, pts[2].x, pts[2].y);
-            debugger.setPoints(pts);
-            debugger.setBarcodeValue(job.result.value);
+            Log.info("  Result={%s} with confidence=%.2f", job.result.value, job.result.confidence);
+
+            if(dbgVisualizer != null) {
+                dbgVisualizer.setPoints(pts);
+                dbgVisualizer.setBarcodeValue(job.result.value);
+            }
 
             if (mListener != null) {
                 mListener.onBarcodeScanSuccess(job.result.value);
@@ -186,7 +190,8 @@ public abstract class ScannerFragmentBase extends Fragment implements SurfaceHol
         }
 
         // tell debugger they can use the buffer we wrote decoding debug data to
-        debugger.flipDebugBuffer();
+        if(dbgVisualizer != null)
+            dbgVisualizer.flipDebugBuffer();
         // tell frame-grabber we can push next (or most recently grabbed) frame to the decoder
         readyForNextFrame = true;
 
@@ -227,7 +232,7 @@ public abstract class ScannerFragmentBase extends Fragment implements SurfaceHol
         public void handleMessage(Message msg) {
             //Log.debug("On thread=%d got msg=%d", Thread.currentThread().getId(), msg.what);
             if (msg.what == R.id.scannerFragmentJobCompleted) {
-                fragment.onDecodeCompleted((DecodingJob) msg.obj);
+                fragment.onJobCompleted((DecodingJob) msg.obj);
             }
         }
     }

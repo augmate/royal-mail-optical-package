@@ -3,14 +3,9 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <TextView
-        android:text="Please Scan Box.."
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
-
     <!--
     Augmate Scanner Fragment
-    will display camera output, capture frames, and extract barcodes out of them
+    will display camera output, capture frames, and extract barcodes
     style this however you want
     -->
     <fragment
@@ -18,6 +13,13 @@
         android:name="com.augmate.counter.CustomScannerFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:layout="@layout/fragment_scanner" />
+        android:layout_margin="25dp"/>
+
+    <TextView
+        android:text="Please, scan box:"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:textSize="20dp"/>
 
 </FrameLayout>

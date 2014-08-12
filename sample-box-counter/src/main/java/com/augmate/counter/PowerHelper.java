@@ -5,6 +5,9 @@ import android.content.Context;
 import android.os.PowerManager;
 import com.augmate.sdk.logger.Log;
 
+/**
+ * Turn on glass display programmatically
+ */
 class PowerHelper {
     private Activity mainActivity;
     private PowerManager.WakeLock lock;
@@ -19,7 +22,7 @@ class PowerHelper {
             if (!powerManager.isScreenOn()) {
                 Log.debug("Screen was off when wake was requested.");
                 Log.debug("Acquiring wake-lock..");
-                lock = powerManager.newWakeLock(PowerManager.ACQUIRE_CAUSES_WAKEUP | PowerManager.SCREEN_BRIGHT_WAKE_LOCK, MainActivity.class.getName());
+                lock = powerManager.newWakeLock(PowerManager.ACQUIRE_CAUSES_WAKEUP | PowerManager.PARTIAL_WAKE_LOCK, MainActivity.class.getName());
             }
         }
     }

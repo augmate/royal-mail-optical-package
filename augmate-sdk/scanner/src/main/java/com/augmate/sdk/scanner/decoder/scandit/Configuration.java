@@ -28,8 +28,8 @@ public class Configuration {
     public static Configuration createHardcoded() {
         return new Configuration() {
             {
-                filesDir = new File("/data/data/com.augmate.cycle.ups/files");
-                platformAppId = "com.augmate.cycle.ups";
+                filesDir = new File("/data/data/com.augmate.counter/files");
+                platformAppId = "com.augmate.counter";
                 deviceId = "672be28ec4178d40";
             }
         };
