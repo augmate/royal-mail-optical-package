@@ -1,1 +1,1 @@
-include ':CycleCounting', ':truck-loading', ':AugmateSDK:scanner', ':AugmateSDK:voice', ':AugmateSDK:logger'
+include ':truck-loading', ':augmate-sdk:scanner', ':augmate-sdk:voice', ':augmate-sdk:logger'

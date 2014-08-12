@@ -5,10 +5,6 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import com.augmate.sdk.logger.Log;
-import com.augmate.sdk.scanner.decoding.Decoder;
-import com.augmate.sdk.scanner.scandit_decoder.Configuration;
-
-import java.io.File;
 
 public class MainActivity extends Activity {
     PowerHelper powerHelper = new PowerHelper(this);

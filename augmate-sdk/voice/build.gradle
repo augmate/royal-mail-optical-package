@@ -6,7 +6,7 @@ buildscript {
         classpath 'com.android.tools.build:gradle:0.12.1'
     }
 }
-apply plugin: 'com.android.application'
+apply plugin: 'com.android.library'
 
 repositories {
     mavenCentral()
@@ -15,15 +15,6 @@ repositories {
 android {
     compileSdkVersion 'Google Inc.:Glass Development Kit Preview:19'
     buildToolsVersion '20.0.0'
-
-    // to make gradle 0.12 happy
-    useOldManifestMerger true
-
-    // log4j is causing a LOT of lint errors :(
-    lintOptions {
-        abortOnError false
-    }
-
     defaultConfig {
         minSdkVersion 19
         targetSdkVersion 19
@@ -40,11 +31,8 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
         }
     }
-
-    packagingOptions {
-        exclude 'LICENSE.txt'
-        exclude 'META-INF/LICENSE.txt'
-        exclude 'META-INF/NOTICE.txt'
+    lintOptions {
+        abortOnError false
     }
     productFlavors {
     }
@@ -52,7 +40,5 @@ android {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile project(':augmate-sdk:scanner')
-    compile project(':augmate-sdk:voice')
     compile project(':augmate-sdk:logger')
 }
