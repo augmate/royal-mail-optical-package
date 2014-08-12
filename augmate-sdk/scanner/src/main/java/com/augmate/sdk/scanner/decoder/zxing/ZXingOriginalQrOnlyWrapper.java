@@ -6,13 +6,13 @@ import com.augmate.sdk.logger.What;
 import com.augmate.sdk.scanner.decoder.BarcodeResult;
 import com.augmate.sdk.scanner.decoder.DecodingJob;
 import com.google.zxing.*;
-import com.google.zxing.common.HybridBinarizer;
+import com.google.zxing.common.GlobalHistogramBinarizer;
 import com.google.zxing.qrcode.QRCodeReader;
 
 /**
- * Wrapper around the original untouched ZXing java barcode detector
- * All benchmarks for ZXing hacks will be compared to this.
- * We are only doing QR code scanning here for speed and simplicity
+ * Wrapper around the original untouched open-source yet unsupported ZXing java barcode detector
+ * All benchmarks for ZXing hacks will be compared against this.
+ * For speed improvement, we are only handling QR codes here.
  */
 public class ZXingOriginalQrOnlyWrapper implements IBarcodeScannerWrapper {
     protected QRCodeReader qrCodeReader = new QRCodeReader();
@@ -29,8 +29,11 @@ public class ZXingOriginalQrOnlyWrapper implements IBarcodeScannerWrapper {
         job.decodeStartedAt = What.timey();
         job.binarizationAt = What.timey();
 
+        // binarization is where an incredible amount of time is wasted
+        // bitmap.getBlackMatrix() is very expensive as a result of HybridBinarizer (and the global one too)
+        // a native port of just this step makes things 2-3x faster right off the bat
         PlanarYUVLuminanceSource source = new PlanarYUVLuminanceSource(data, width, height, 0, 0, width, height, false);
-        BinaryBitmap bitmap = new BinaryBitmap(new HybridBinarizer(source));
+        BinaryBitmap bitmap = new BinaryBitmap(new GlobalHistogramBinarizer(source));
 
         try {
 
@@ -52,16 +55,12 @@ public class ZXingOriginalQrOnlyWrapper implements IBarcodeScannerWrapper {
                 Point pt2 = new Point((int) pts[1].getX(), (int) pts[1].getY());
                 Point pt3 = new Point((int) pts[2].getX(), (int) pts[2].getY());
 
-                Point upVector = new Point(pt2.x - pt1.x, pt2.y - pt1.y);;
-                Point rightVector = new Point(pt3.x - pt2.x, pt3.y - pt2.y);;
-
+                Point rightVector = new Point(pt3.x - pt2.x, pt3.y - pt2.y);
                 Point pt4 = new Point(pt1.x + rightVector.x, pt1.y + rightVector.y); // bottom right
 
                 job.result.setDirectly(pt1, pt2, pt3, pt4);
 
-                // confidence of 5 = barcode decoded
-                // values of 1 and 2 = sees something that might be a barcode
-                // value of 0 or -1 = nothing in the image worth looking at
+                // confidence values [0,1]
                 job.result.confidence = 1;
                 job.result.value = result.getText();
                 job.result.format = BarcodeResult.Format.QRCode;
@@ -72,7 +71,7 @@ public class ZXingOriginalQrOnlyWrapper implements IBarcodeScannerWrapper {
             // expected failure case when zxing-lib doesn't locate a qr-code. don't log.
         } catch (ChecksumException err) {
             // not a problem, just interesting
-            Log.debug("ZXing detected checksum error in QR code");
+            //Log.debug("ZXing detected checksum error in QR code");
         } catch (Exception err) {
             // unexpected failure. worth noting.
             Log.exception(err, "Error detecting QR code using ZXing");

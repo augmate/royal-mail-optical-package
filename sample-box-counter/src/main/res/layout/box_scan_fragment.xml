@@ -1,9 +1,7 @@
 <!--
-    Augmate Scanner - customize to your desire
-    the only requirement here is the SurfaceView
-        camera will render to the SurfaceView
-        we grab frames off it and process it in a decoder engine
-        decoder engine then calls back to parent activity with any identified barcodes
+    customize to your desire
+    the only requirement here is the SurfaceView.
+    it can be resized,
 -->
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"

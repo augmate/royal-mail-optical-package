@@ -2,12 +2,9 @@ package com.augmate.sdk.logger;
 
 import android.content.Context;
 import android.os.Build;
-import android.os.SystemClock;
 import android.provider.Settings;
 import com.augmate.sdk.logger.Local.LocalAppender;
 import com.augmate.sdk.logger.Local.LocalFormat;
-import com.augmate.sdk.logger.Logentries.LogentriesFormat;
-import com.logentries.log4j.LogentriesAppender;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
@@ -54,28 +51,29 @@ public class Log {
 
     private static Logger createInstance(String deviceId) {
 
-        // not super random or collision free
+        // not super random or collision free, but good enough for quick grouping/filtering of logs by unique runs
         String sessionId = Long.toString(Math.abs(java.util.UUID.randomUUID().getLeastSignificantBits()), 36).substring(0, 6);
 
+        /* FIXME: LogEntries library needs to be updated
         // remote output
-        // FIXME: LogEntries library needs to be updated
-//        LogentriesAppender logentriesAppender = new LogentriesAppender();
-//        logentriesAppender.setToken("c3a45763-9854-43cc-838a-7a1b71418c6c");
-//        logentriesAppender.setDebug(true);
-//        logentriesAppender.setLayout(new LogentriesFormat(sessionId, deviceId));
-//        logentriesAppender.setSsl(false);
+        LogentriesAppender logentriesAppender = new LogentriesAppender();
+        logentriesAppender.setToken("c3a45763-9854-43cc-838a-7a1b71418c6c");
+        logentriesAppender.setDebug(true);
+        logentriesAppender.setLayout(new LogentriesFormat(sessionId, deviceId));
+        logentriesAppender.setSsl(false);
+        */
 
         // local output
         LocalAppender localAppender = new LocalAppender();
         localAppender.setLayout(new LocalFormat(sessionId, deviceId));
 
-        Logger lgr = Logger.getRootLogger();
-        lgr.addAppender(localAppender);
+        Logger logger = Logger.getRootLogger();
+        logger.addAppender(localAppender);
         //lgr.addAppender(logentriesAppender);
 
-        lgr.debug("Started session #" + sessionId + " + logging on " + Build.MANUFACTURER + " " + Build.MODEL + " version=" + Build.ID);
+        logger.debug("Started session #" + sessionId + " + logging on " + Build.MANUFACTURER + " " + Build.MODEL + " version=" + Build.ID);
 
-        return lgr;
+        return logger;
     }
 
     private static Logger getLogger() {
@@ -126,26 +124,10 @@ public class Log {
 
     /**
      * Would be nice to have an easy way to sprinkle timers throughout code
-     * @param format
-     * @return
+     * @param name string name of timer
+     * @return Timer
      */
-    public static ScopeTimer startTimer(String format) {
-        return new ScopeTimer(format);
-    }
-
-    public static class ScopeTimer {
-        public long start;
-        public long span;
-        public String str;
-
-        public ScopeTimer(String str) {
-            this.start = SystemClock.elapsedRealtime();
-            this.str = str;
-        }
-
-        public void stopTimer() {
-            span = SystemClock.elapsedRealtime() - start;
-            Log.info(str, span);
-        }
+    public static Timer startTimer(String name) {
+        return new Timer(name);
     }
 }

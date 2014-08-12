@@ -5,6 +5,7 @@ import android.hardware.Camera;
 import android.os.Build;
 import android.view.SurfaceHolder;
 import com.augmate.sdk.logger.Log;
+import com.augmate.sdk.logger.Timer;
 
 import java.io.IOException;
 
@@ -17,6 +18,7 @@ class CameraController {
     /**
      * Configures camera around a rendering context
      * Ensures optimal configuration for capturing barcodes
+     *
      * @param width
      * @param height
      * @param surfaceHolder
@@ -28,19 +30,19 @@ class CameraController {
         int numOfCameras = Camera.getNumberOfCameras();
         Log.debug("There are %d cameras available", numOfCameras);
 
-        assert(numOfCameras > 0);
+        assert (numOfCameras > 0);
 
         int bestCameraIdx = 0;
         Camera.CameraInfo cameraInfo = new Camera.CameraInfo();
         for (int i = 0; i < numOfCameras; i++) {
             Camera.getCameraInfo(i, cameraInfo);
             Log.debug("  Camera #%d facing=%d orientation=%d", i, cameraInfo.facing, cameraInfo.orientation);
-            if(cameraInfo.facing == Camera.CameraInfo.CAMERA_FACING_BACK) {
+            if (cameraInfo.facing == Camera.CameraInfo.CAMERA_FACING_BACK) {
                 bestCameraIdx = i;
             }
         }
 
-        Log.ScopeTimer cameraTimer = Log.startTimer("Opening camera took %d msec");
+        Timer cameraTimer = Log.startTimer("Opening camera took %d msec");
 
         // try to open the first available camera
         try {
@@ -58,7 +60,7 @@ class CameraController {
             Log.exception(e, "Failed to open camera interface");
         }
 
-        cameraTimer.stopTimer();
+        cameraTimer.stop();
 
         Camera.Parameters params = createCameraConfigurationParameters(camera, width, height);
 
@@ -76,13 +78,13 @@ class CameraController {
 
         try {
             camera.startPreview();
-        }
-        catch(Exception err) {
+        } catch (Exception err) {
             // FIXME: it's possible to get the emulator and glass into a state where the camera stops responding
             //        probably a problem with the underlying Camera HAL. restarting fixes it.
             Log.exception(err, "Failed to start camera frame feed!");
         }
 
+        // zooming is back on Glass after XE16!
         camera.startSmoothZoom(14);
 
         Log.debug("Started camera frame-grabbing.");
@@ -92,7 +94,7 @@ class CameraController {
      * safe to call multiple times
      */
     public void endFrameCapture() {
-        if(camera != null) {
+        if (camera != null) {
             Log.debug("Stopping camera frame-grabbing");
             camera.setPreviewCallbackWithBuffer(null);
             camera.stopPreview();

@@ -13,10 +13,10 @@ import com.augmate.sdk.scanner.ScannerVisualDebugger;
  * When overriding methods, make sure to call their base versions
  * Specifically: onPause, onResume, onAttach, onDetach
  */
-public class CustomScannerFragment extends ScannerFragmentBase {
+public class BoxCountingScanFragment extends ScannerFragmentBase {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_scanner, container, false);
+        View view = inflater.inflate(R.layout.box_scan_fragment, container, false);
 
         ScannerVisualDebugger dbg = (ScannerVisualDebugger) view.findViewById(R.id.scanner_visual_debugger);
         SurfaceView sv = (SurfaceView) view.findViewById(R.id.camera_preview);

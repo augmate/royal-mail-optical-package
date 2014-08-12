@@ -7,8 +7,8 @@ import android.graphics.Point;
  */
 public class BarcodeResult {
     public BarcodeResult() {
-        for(int i = 0; i < 4; i ++)
-            corners[i] = new Point(0,0);
+        for (int i = 0; i < 4; i++)
+            corners[i] = new Point(0, 0);
     }
 
     // 4 points representing an unaligned bounding box
@@ -30,22 +30,22 @@ public class BarcodeResult {
     }
 
     public void setAABB(int x, int y, int width, int height) {
-        corners[0].x = x - width/2;
-        corners[0].y = y - height/2;
+        corners[0].x = x - width / 2;
+        corners[0].y = y - height / 2;
 
-        corners[1].x = x + width/2;
-        corners[1].y = y - height/2;
+        corners[1].x = x + width / 2;
+        corners[1].y = y - height / 2;
 
-        corners[2].x = x + width/2;
-        corners[2].y = y + height/2;
+        corners[2].x = x + width / 2;
+        corners[2].y = y + height / 2;
 
-        corners[3].x = x - width/2;
-        corners[3].y = y + height/2;
+        corners[3].x = x - width / 2;
+        corners[3].y = y + height / 2;
     }
 
     public long timestamp = 0;
 
     public enum Format {
         UNKNOWN, Code_39, Code_128, QRCode, MaxiCode
-    };
+    }
 }

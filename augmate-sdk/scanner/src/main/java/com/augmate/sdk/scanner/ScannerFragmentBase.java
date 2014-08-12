@@ -18,7 +18,7 @@ public abstract class ScannerFragmentBase extends Fragment implements SurfaceHol
     private OnScannerResultListener mListener;
     private boolean readyForNextFrame = true;
     private ScannerVisualDebugger dbgVisualizer;
-    private DecodingThread decodingThread;
+    private DecoderThread decoderThread;
     private SurfaceView surfaceView;
     private int framesSkipped = 0;
 
@@ -85,33 +85,33 @@ public abstract class ScannerFragmentBase extends Fragment implements SurfaceHol
     }
 
     private void startDecodingThread() {
-        if(decodingThread == null) {
+        if (decoderThread == null) {
             // spawn a decoding thread and connect it to our message pump
-            decodingThread = new DecodingThread(new ScannerFragmentMessages(this));
-            decodingThread.start();
+            decoderThread = new DecoderThread(new ScannerFragmentMessages(this));
+            decoderThread.start();
         }
     }
 
     private void shutdownDecodingThread() {
 
-        if (decodingThread != null) {
+        if (decoderThread != null) {
             // shutdown
 
             Log.debug("Asking message pump to exit..");
 
-            decodingThread.getMessagePump()
+            decoderThread.getMessagePump()
                     .obtainMessage(R.id.decodingThreadShutdown)
                     .sendToTarget();
 
             Log.debug("Waiting on decoding-thread to exit (timeout: 5s)");
 
             try {
-                decodingThread.join(5000);
+                decoderThread.join(5000);
             } catch (InterruptedException e) {
                 Log.exception(e, "Interrupted while waiting on decoding thread");
             }
 
-            decodingThread = null;
+            decoderThread = null;
             Log.debug("Decoding-thread has been shutdown.");
         }
     }
@@ -128,7 +128,7 @@ public abstract class ScannerFragmentBase extends Fragment implements SurfaceHol
         Log.debug("  Surface has size of %d x %d", surfaceHolder.getSurfaceFrame().width(), surfaceHolder.getSurfaceFrame().height());
 
         // configure debugging render-target
-        if(dbgVisualizer != null)
+        if (dbgVisualizer != null)
             dbgVisualizer.setFrameBufferSettings(frameBufferSettings.width, frameBufferSettings.height);
 
         // configure camera frame-grabbing
@@ -155,7 +155,7 @@ public abstract class ScannerFragmentBase extends Fragment implements SurfaceHol
             // kick-off frame decoding in a dedicated thread
             DecodingJob job = new DecodingJob(frameBufferSettings.width, frameBufferSettings.height, bytes, dbgVisualizer != null ? dbgVisualizer.getNextDebugBuffer() : null);
 
-            decodingThread.getMessagePump()
+            decoderThread.getMessagePump()
                     .obtainMessage(R.id.decodingThreadNewJob, job)
                     .sendToTarget();
 
@@ -179,7 +179,7 @@ public abstract class ScannerFragmentBase extends Fragment implements SurfaceHol
             Point[] pts = job.result.corners;
             Log.info("  Result={%s} with confidence=%.2f", job.result.value, job.result.confidence);
 
-            if(dbgVisualizer != null) {
+            if (dbgVisualizer != null) {
                 dbgVisualizer.setPoints(pts);
                 dbgVisualizer.setBarcodeValue(job.result.value);
             }
@@ -190,7 +190,7 @@ public abstract class ScannerFragmentBase extends Fragment implements SurfaceHol
         }
 
         // tell debugger they can use the buffer we wrote decoding debug data to
-        if(dbgVisualizer != null)
+        if (dbgVisualizer != null)
             dbgVisualizer.flipDebugBuffer();
         // tell frame-grabber we can push next (or most recently grabbed) frame to the decoder
         readyForNextFrame = true;

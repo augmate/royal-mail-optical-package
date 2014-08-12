@@ -19,7 +19,6 @@ public class ScannerVisualDebugger extends View {
     private Point[] boxCorners;
     private Paint boxLineColor;
     private Paint boxPointColor;
-    private Paint generalPaint;
     private float scaleX;
     private float scaleY;
     private String barcodeValue;
@@ -46,10 +45,6 @@ public class ScannerVisualDebugger extends View {
     }
 
     private void preparePaints() {
-        generalPaint = new Paint();
-        generalPaint.setColor(0xaa1abc9c);
-        generalPaint.setStrokeWidth(25.0f);
-
         boxLineColor = new Paint();
         boxLineColor.setColor(0xEE22AA99);
         boxLineColor.setStrokeWidth(2.0f);
@@ -99,14 +94,14 @@ public class ScannerVisualDebugger extends View {
         scaleX = (float) canvas.getWidth() / (float) rawImgWidth;
         scaleY = (float) canvas.getHeight() / (float) rawImgHeight;
 
-        boxLineColor.setAlpha((int)(barcodeConfidence * barcodeConfidence * 255));
-        boxPointColor.setAlpha((int)(barcodeConfidence * 255));
+        boxLineColor.setAlpha((int) (barcodeConfidence * barcodeConfidence * 255));
+        boxPointColor.setAlpha((int) (barcodeConfidence * 255));
 
         if (debugImg != null) {
             canvas.drawBitmap(debugImg[currentDebugBufferIdx], 0, rawImgWidth, 0, 0, rawImgWidth, rawImgHeight, true, null);
         }
 
-        if(boxCorners != null && boxCorners.length == 4) {
+        if (boxCorners != null && boxCorners.length == 4) {
 
             for (int i = 0; i < 4; i++) {
                 drawLine(canvas, boxLineColor, boxCorners[i], boxCorners[(i + 1) % 4]);
@@ -137,11 +132,12 @@ public class ScannerVisualDebugger extends View {
 
     /**
      * barcode bounding box
+     *
      * @param pts 4 corner points
      */
     public void setPoints(Point[] pts) {
         boxCorners = pts.clone();
-        for(Point pt : boxCorners) {
+        for (Point pt : boxCorners) {
             pt.x *= scaleX;
             pt.y *= scaleY;
         }
@@ -150,6 +146,7 @@ public class ScannerVisualDebugger extends View {
 
     /**
      * reallocates rgba debug output buffer that scanner paints unto
+     *
      * @param width
      * @param height
      */

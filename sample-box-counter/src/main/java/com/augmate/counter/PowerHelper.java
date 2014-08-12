@@ -21,16 +21,21 @@ class PowerHelper {
             PowerManager powerManager = (PowerManager) mainActivity.getSystemService(Context.POWER_SERVICE);
             if (!powerManager.isScreenOn()) {
                 Log.debug("Screen was off when wake was requested.");
-                Log.debug("Acquiring wake-lock..");
-                lock = powerManager.newWakeLock(PowerManager.ACQUIRE_CAUSES_WAKEUP | PowerManager.PARTIAL_WAKE_LOCK, MainActivity.class.getName());
+                Log.debug("Acquiring wake-lock.");
+                lock = powerManager.newWakeLock(PowerManager.ACQUIRE_CAUSES_WAKEUP | PowerManager.SCREEN_BRIGHT_WAKE_LOCK, MainActivity.class.getName());
+                powerManager.wakeUp(1000);
             }
         }
     }
 
     public void release() {
         if (lock != null) {
-            Log.debug("Releasing wake-lock..");
-            lock.release();
+            if(lock.isHeld()) {
+                Log.debug("Releasing wake-lock.");
+                lock.release();
+            } else {
+                Log.debug("Lock found but isn't held.");
+            }
             lock = null;
         }
     }

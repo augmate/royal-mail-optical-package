@@ -9,6 +9,7 @@ import com.augmate.sdk.scanner.decoder.zxing.IBarcodeScannerWrapper;
 import com.mirasense.scanditsdk.ScanditSDKBarcodeReader;
 
 // all reader interaction reversed out of scandit sdk
+// TODO: add relevant copyright/license info
 
 public class ScanditWrapper implements IBarcodeScannerWrapper {
     protected ScanditSDKBarcodeReader reader;

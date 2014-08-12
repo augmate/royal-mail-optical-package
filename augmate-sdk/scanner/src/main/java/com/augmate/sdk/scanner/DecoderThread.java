@@ -4,17 +4,16 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import com.augmate.sdk.logger.Log;
-import com.augmate.sdk.scanner.decoder.Decoder;
 import com.augmate.sdk.scanner.decoder.DecodingJob;
 
 import java.util.concurrent.CountDownLatch;
 
-final class DecodingThread extends Thread {
+final class DecoderThread extends Thread {
     private DecodingThreadMessages messagePump;
     private CountDownLatch isMsgPumpReady; // cross-thread synchronization (TODO: is there a simpler lock available?)
     private Handler producerThreadHandler;
 
-    DecodingThread(Handler producerThreadHandler) {
+    DecoderThread(Handler producerThreadHandler) {
         super();
         this.producerThreadHandler = producerThreadHandler;
         this.isMsgPumpReady = new CountDownLatch(1);
@@ -58,7 +57,7 @@ final class DecodingThread extends Thread {
     }
 
     private final class DecodingThreadMessages extends Handler {
-        private Decoder decoder = new Decoder();
+        private DecoderManager decoderManager = new DecoderManager();
 
         @Override
         public void handleMessage(Message msg) {
@@ -73,7 +72,7 @@ final class DecodingThread extends Thread {
             //Log.debug("Got decoding job with buffer @ 0x%X", job.getLuminance().hashCode());
 
             // the good stuff begins here
-            decoder.process(job);
+            decoderManager.process(job);
 
             producerThreadHandler
                     .obtainMessage(R.id.scannerFragmentJobCompleted, job)

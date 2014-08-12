@@ -2,6 +2,7 @@ package com.augmate.sdk.scanner.decoder.zxing;
 
 /*
  * Copyright 2007 ZXing authors
+ * TODO: import the full copyright information here
  */
 
 import com.google.zxing.ResultPoint;
