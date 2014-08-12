@@ -22,7 +22,7 @@ public class MainActivity extends Activity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == 0x01 && resultCode == RESULT_OK) {
+        if (requestCode == REQUEST_BOX_BARCODE && resultCode == RESULT_OK) {
             String value = data.getStringExtra("barcodeString");
             Log.debug("Got barcode value=%s", value);
 
