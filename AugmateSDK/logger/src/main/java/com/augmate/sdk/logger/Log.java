@@ -80,7 +80,8 @@ public class Log {
     }
 
     public static void exception(Exception err, String format, Object... args) {
-        getLogger().error(String.format(format, args), err);
+        getLogger().error(String.format(format, args));
+        getLogger().error(ExceptionUtils.getStackTrace(err));
     }
 
     public static void error(String format, Object... args) {

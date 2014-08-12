@@ -1,10 +1,7 @@
 package com.augmate.sdk.scanner.decoding;
 
-import com.augmate.sdk.scanner.NativeUtils;
 import com.augmate.sdk.scanner.scandit_decoder.Configuration;
 import com.augmate.sdk.scanner.zxing_decoder.IBarcodeScannerWrapper;
-import com.augmate.sdk.scanner.zxing_decoder.ZXingHackWrapper;
-import com.augmate.sdk.scanner.zxing_decoder.ZXingNativeWrapper;
 import com.augmate.sdk.scanner.zxing_decoder.ZXingOriginalQrOnlyWrapper;
 
 /**

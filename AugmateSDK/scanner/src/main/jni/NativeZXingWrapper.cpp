@@ -49,15 +49,10 @@ vector<Ref<Result> > decode_multi(Ref<BinaryBitmap> image, DecodeHints hints) {
   return reader.decodeMultiple(image, hints);
 }
 
-int read_image(Ref<LuminanceSource> source, bool hybrid) {
-    //vector<Ref<Result> > results;
-    Ref<Result> result;
-    int res = -1;
+bool runNativeZXingPort(Ref<LuminanceSource> source) {
 
-    // for some reason throwing and handling an exception here
-    // keeps zxing-lib from crashing and bringing down the entire application.
-    // zxing internally uses exceptions for control-flow and returning results.
-    // TODO: figure out why the hell this works. it's prolly an exciting reason.
+    // HACK: throwing an zxing exception here causes some magic to happen which allows their native
+    // scanner to work when linked against JNI. yes, really.
 
     try {
         LOGD("Practicing throwing a ReaderException..\n");
@@ -67,19 +62,18 @@ int read_image(Ref<LuminanceSource> source, bool hybrid) {
         LOGD("Caught practice throw. Moving onto better things..\n");
     }
 
-    // TODO ton of room for optimization here! :)
+    // TODO: create a replacement simple binarizer :)
+    //Ref<Binarizer> binarizer(new HybridBinarizer(source));
+    Ref<Binarizer> binarizer(new GlobalHistogramBinarizer(source));
 
-    Ref<Binarizer> binarizer;
-    if (hybrid) {
-      binarizer = new HybridBinarizer(source);
-    } else {
-      binarizer = new GlobalHistogramBinarizer(source);
-    }
+    // QR only
     DecodeHints hints(DecodeHints::QR_CODE_HINT);
-    //hints.setTryHarder(try_harder);
+
+    bool bGotResult = false;
+    Ref<Result> result;
 
     try {
-        LOGD("setting up binary bitmap reference..\n");
+        LOGD("Setting up binary bitmap reference..\n");
         Ref<BinaryBitmap> binary(new BinaryBitmap(binarizer));
         LOGD("Spawning native qrcode decoder..\n");
         Ref<zxing::Reader> qrDecoder(new zxing::qrcode::QRCodeReader());
@@ -87,7 +81,7 @@ int read_image(Ref<LuminanceSource> source, bool hybrid) {
         result = qrDecoder->decode(binary, hints);
         LOGD("Decodering.. Success\n");
 
-        res = 0;
+        bGotResult = true;
     }
     catch(ReaderException& e) {
         LOGD("Caught ReaderException from decoder.\n");
@@ -96,100 +90,41 @@ int read_image(Ref<LuminanceSource> source, bool hybrid) {
         LOGD("Caught a generic exception from decoder.\n");
     }
 
-    if(!res) {
+    if(bGotResult) {
         LOGD("Binarizer succeeded\n");
         LOGD("Format: %s\n", BarcodeFormat::barcodeFormatNames[result->getBarcodeFormat()]);
         LOGD("Result value: %s\n", result->getText()->getText().c_str());
     }
 
-/*
-  try {
-    Ref<Binarizer> binarizer;
-    if (hybrid) {
-      binarizer = new HybridBinarizer(source);
-    } else {
-      binarizer = new GlobalHistogramBinarizer(source);
-    }
-    DecodeHints hints(DecodeHints::DEFAULT_HINT);
-    hints.setTryHarder(try_harder);
-    Ref<BinaryBitmap> binary(new BinaryBitmap(binarizer));
-    if (search_multi) {
-      results = decode_multi(binary, hints);
-    } else {
-      results = decode(binary, hints);
-    }
-    res = 0;
-  } catch (const ReaderException& e) {
-    cell_result = "zxing::ReaderException: " + string(e.what());
-    res = -2;
-  } catch (const zxing::IllegalArgumentException& e) {
-    cell_result = "zxing::IllegalArgumentException: " + string(e.what());
-    res = -3;
-  } catch (const zxing::Exception& e) {
-    cell_result = "zxing::Exception: " + string(e.what());
-    res = -4;
-  } catch (const std::exception& e) {
-    cell_result = "std::exception: " + string(e.what());
-    res = -5;
-  }
-  */
-
-/*
-  if (res != 0 && (verbose || (use_global ^ use_hybrid))) {
-    cout << (hybrid ? "Hybrid" : "Global")
-         << " binarizer failed: " << cell_result << endl;
-  } else if (!test_mode) {
-    if (verbose) {
-      cout << (hybrid ? "Hybrid" : "Global")
-           << " binarizer succeeded: " << endl;
-    }
-    for (size_t i = 0; i < results.size(); i++) {
-      if (more) {
-        cout << "  Format: "
-             << BarcodeFormat::barcodeFormatNames[results[i]->getBarcodeFormat()]
-             << endl;
-        for (int j = 0; j < results[i]->getResultPoints()->size(); j++) {
-          cout << "  Point[" << j <<  "]: "
-               << results[i]->getResultPoints()[j]->getX() << " "
-               << results[i]->getResultPoints()[j]->getY() << endl;
-        }
-      }
-      if (verbose) {
-        cout << "    ";
-      }
-      cout << results[i]->getText()->getText() << endl;
-    }
-  }
-  */
-
-  return res;
+    return bGotResult;
 }
 
+void zxingNativeDecodeImpl(unsigned char* src, unsigned int width, unsigned int height) {
+    zxing::ArrayRef<char> image = zxing::ArrayRef<char>((char*) src, width * height);
+    zxing::GreyscaleLuminanceSource* luminance = new zxing::GreyscaleLuminanceSource(image, width, height, 0, 0, width, height);
+    zxing::Ref<LuminanceSource> luminanceSource = zxing::Ref<LuminanceSource>(luminance);
+    runNativeZXingPort(luminanceSource);
+}
+
+// exportable wrappers for linkage
 extern "C" {
+
     void zxingNativeDecode(unsigned char* src, unsigned int width, unsigned int height) {
         LOGD("Executing native decoder under: %s\n", ABI);
-
-        zxing::ArrayRef<char> image = zxing::ArrayRef<char>((char*) src, width * height);
-        zxing::GreyscaleLuminanceSource* luminance = new zxing::GreyscaleLuminanceSource(image, width, height, 0, 0, width, height);
-        zxing::Ref<LuminanceSource> luminanceSource = zxing::Ref<LuminanceSource>(luminance);
-        read_image(luminanceSource, true);
-
+        zxingNativeDecodeImpl(src, width, height);
         LOGD("Executed native zxing!\n");
     }
 
     int main() {
-        printf("Giving it a try from CLI..\n");
+        printf("Testing native zxing decoder in CLI\n");
 
         int width = 640;
         int height = 360;
-        char* src = new char[width * height];
+        unsigned char* src = new unsigned char[width * height];
 
-        zxing::ArrayRef<char> image = zxing::ArrayRef<char>((char*) src, width * height);
-        zxing::GreyscaleLuminanceSource* luminance = new zxing::GreyscaleLuminanceSource(image, width, height, 0, 0, width, height);
-        zxing::Ref<LuminanceSource> luminanceSource = zxing::Ref<LuminanceSource>(luminance);
-        read_image(luminanceSource, false);
+        zxingNativeDecodeImpl(src, width, height);
 
-        LOGD("Executed native zxing!\n");
+        LOGD("ZXing completed successfully.\n");
 
         return 0;
     }

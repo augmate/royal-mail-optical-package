@@ -2,21 +2,14 @@ package com.augmate.sdk.scanner;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
 import android.util.AttributeSet;
 import android.view.View;
-import com.augmate.sdk.logger.Log;
-
-import java.util.ArrayList;
+import com.augmate.sdk.logger.What;
 
 public class ScannerVisualDebugger extends View {
-    //private final DebugVizMessages msgHandler = new DebugVizMessages(this);
-
-    // animated points
-    // TODO: kill this
-    public ArrayList<Point> mMessagePoints = new ArrayList<Point>();
-
     public int rawImgWidth = 0;
     public int rawImgHeight = 0;
     public int[][] debugImg = null;
@@ -30,6 +23,9 @@ public class ScannerVisualDebugger extends View {
     private float scaleX;
     private float scaleY;
     private String barcodeValue;
+    private float barcodeConfidence = 1;
+    private long lastFrameRendered = 0;
+    private Paint textShadowColor;
 
     public ScannerVisualDebugger(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
@@ -61,6 +57,13 @@ public class ScannerVisualDebugger extends View {
         boxPointColor = new Paint();
         boxPointColor.setColor(0xAA22AA99);
         boxPointColor.setStrokeWidth(5.0f);
+
+        textShadowColor = new Paint();
+        textShadowColor.setAntiAlias(true);
+        textShadowColor.setShadowLayer(2.0f, 0, 0.0f, Color.BLACK);
+        textShadowColor.setColor(Color.WHITE);
+        textShadowColor.setStrokeWidth(4.0f);
+        textShadowColor.setTextSize(14.0f);
     }
 
     /**
@@ -87,8 +90,17 @@ public class ScannerVisualDebugger extends View {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
+        long now = What.timey();
+        long frameLength = now - lastFrameRendered;
+        lastFrameRendered = now;
+        //float frameTicks = (float) frameLength / 16.0f; // assume 60hz
+        float frameScale = (float) frameLength / 1000.0f;
+
         scaleX = (float) canvas.getWidth() / (float) rawImgWidth;
         scaleY = (float) canvas.getHeight() / (float) rawImgHeight;
+
+        boxLineColor.setAlpha((int)(barcodeConfidence * barcodeConfidence * 255));
+        boxPointColor.setAlpha((int)(barcodeConfidence * 255));
 
         canvas.drawRect(10, 10, 100, 100, generalPaint);
 
@@ -103,38 +115,26 @@ public class ScannerVisualDebugger extends View {
             }
 
             for (int i = 0; i < 4; i++) {
-                drawPoint(canvas, boxPointColor, boxCorners[i]);
+                canvas.drawCircle(boxCorners[i].x, boxCorners[i].y, 4, boxPointColor);
             }
 
-            canvas.drawText("QR Code:", boxCorners[3].x, boxCorners[3].y + 20, boxPointColor);
-            canvas.drawText("[" + barcodeValue + "]", boxCorners[3].x + 100, boxCorners[3].y + 20, boxPointColor);
+            int minX = Math.min(Math.min(boxCorners[0].x, boxCorners[2].x), Math.min(boxCorners[1].x, boxCorners[3].x));
+            int minY = Math.min(Math.min(boxCorners[0].y, boxCorners[2].y), Math.min(boxCorners[1].y, boxCorners[3].y));
+
+            canvas.drawText("QR Code: [" + barcodeValue + "]", minX - 20, minY - 20, textShadowColor);
         }
 
-        ArrayList<Point> pts = new ArrayList<Point>(mMessagePoints);
-
-        for (Point point : pts) {
-            point.y -= 18;
-
-            if (point.y < -10) {
-                mMessagePoints.remove(point);
-            }
-        }
-
-        for (Point point : pts) {
-            //Log.i(TAG, "drawing point: " + ((float)point.x * scaleX) + "," + ((float)point.y * scaleY));
-            canvas.drawCircle((float) point.x, (float) point.y, 25.0f, generalPaint);
-            canvas.drawCircle((float) point.x, (float) point.y, 15.0f, generalPaint);
-        }
+        barcodeConfidence = Math.max(0, barcodeConfidence - 3.0f * frameScale);
 
         postInvalidate();
     }
 
     private void drawPoint(Canvas canvas, Paint paint, Point pt) {
-        canvas.drawPoint(pt.x * scaleX, pt.y * scaleY, paint);
+        canvas.drawPoint(pt.x, pt.y, paint);
     }
 
     private void drawLine(Canvas canvas, Paint paint, Point a, Point b) {
-        canvas.drawLine(a.x * scaleX, a.y * scaleY, b.x * scaleX, b.y * scaleY, paint);
+        canvas.drawLine(a.x, a.y, b.x, b.y, paint);
     }
 
     /**
@@ -143,6 +143,11 @@ public class ScannerVisualDebugger extends View {
      */
     public void setPoints(Point[] pts) {
         boxCorners = pts.clone();
+        for(Point pt : boxCorners) {
+            pt.x *= scaleX;
+            pt.y *= scaleY;
+        }
+        barcodeConfidence = 1;
     }
 
     /**
@@ -159,29 +164,4 @@ public class ScannerVisualDebugger extends View {
     public void setBarcodeValue(String barcodeValue) {
         this.barcodeValue = barcodeValue;
     }
-
-    // TODO: is this DEFUNC?
-
-//    public DebugVizMessages getHandler() {
-//        return msgHandler;
-//    }
-//
-//    private static class DebugVizMessages extends Handler {
-//        private final String TAG = DebugVizMessages.class.getName();
-//        private final ScannerVisualDebugger scanActivity;
-//
-//        DebugVizMessages(ScannerVisualDebugger activity) {
-//            this.scanActivity = activity;
-//        }
-//
-//        @Override
-//        public void handleMessage(Message message) {
-//            if (message.what == R.id.decodingThreadNewJob) {
-//                Log.d(TAG, "Got new points for visualization");
-//                Point[] pts = (Point[]) message.obj;
-//                if (pts.length == 3)
-//                    scanActivity.setPoints(pts[0], pts[1], pts[2]);
-//            }
-//        }
-//    }
 }

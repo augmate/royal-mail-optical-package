@@ -75,8 +75,6 @@ final class DecodingThread extends Thread {
             // the good stuff begins here
             decoder.process(job);
 
-            Log.debug("Decoder completed job");
-
             producerThreadHandler
                     .obtainMessage(R.id.scannerFragmentJobCompleted, job)
                     .sendToTarget();
