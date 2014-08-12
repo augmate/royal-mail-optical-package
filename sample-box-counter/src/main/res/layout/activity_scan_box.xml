@@ -15,7 +15,7 @@
     -->
     <fragment
         android:id="@+id/scanner"
-        android:name="com.augmate.cycle.ups.CustomScannerFragment"
+        android:name="com.augmate.counter.CustomScannerFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:layout="@layout/fragment_scanner" />

@@ -1,5 +1,6 @@
-package com.augmate.cycle.ups;
+package com.augmate.counter;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.view.View;
@@ -27,5 +28,10 @@ public class BoxScannerActivity extends FragmentActivity implements ScannerFragm
     @Override
     public void onBarcodeScanSuccess(String result) {
         Log.debug("Got scanning result: [%s]", result);
+
+        Intent resultIntent = new Intent();
+        resultIntent.putExtra("barcodeString", result);
+        setResult(RESULT_OK, resultIntent);
+        finish();
     }
 }

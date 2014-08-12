@@ -1,4 +1,4 @@
-package com.augmate.cycle.ups;
+package com.augmate.counter;
 
 import android.app.Application;
 import com.augmate.sdk.logger.Log;

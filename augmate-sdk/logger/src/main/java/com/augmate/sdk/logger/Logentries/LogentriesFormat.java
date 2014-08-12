@@ -1,19 +1,20 @@
-package com.augmate.sdk.logger;
+package com.augmate.sdk.logger.Logentries;
 
+import com.augmate.sdk.logger.Log;
+import com.augmate.sdk.logger.What;
 import org.apache.log4j.Layout;
 import org.apache.log4j.spi.LoggingEvent;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
-public class LogEntriesFormat extends Layout
+public class LogentriesFormat extends Layout
 {
-    private static final String TAG = LogEntriesFormat.class.getName();
     private final DateTimeFormatter timestampFormat = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss.SSS");
     
     private String sessionId;
     private String deviceId;
     
-    public LogEntriesFormat(String sessionId, String deviceId) {
+    public LogentriesFormat(String sessionId, String deviceId) {
         this.sessionId = sessionId;
         this.deviceId = deviceId;
     }
@@ -59,30 +60,29 @@ public class LogEntriesFormat extends Layout
      */
     
     public static String getFrame(int popFrames) {
-        StackTraceElement[] stack = Thread.currentThread().getStackTrace();
-
-        boolean bNextFrameOut = false;
+        StackTraceElement[] stack = What.stack();
         StackTraceElement callerFrame = null;
+        String callerPath = "(N/A)";
+
+        boolean nextFrameOut = false;
 
         for (StackTraceElement frame : stack) {
             String frameClass = frame.getClassName();
 
-            if (bNextFrameOut && !frameClass.equals(Log.class.getName()) && popFrames-- <= 0) {
+            if (nextFrameOut && !frameClass.equals(Log.class.getName()) && popFrames-- <= 0) {
                 callerFrame = frame;
                 break;
             }
 
             // wait until we are out of the logging system before counting frames
-            if (!bNextFrameOut && frameClass.equals(Log.class.getName())) {
-                bNextFrameOut = true;
+            if (!nextFrameOut && frameClass.equals(Log.class.getName())) {
+                nextFrameOut = true;
             }
         }
 
-        // impossible? case: if the top caller was the log itself, use it as the caller source
+        // impossible case? if the top caller was the log itself, use it as the caller source
         if (callerFrame == null && stack.length > 0)
             callerFrame = stack[stack.length - 1];
-
-        String callerPath = "(N/A)";
 
         if (callerFrame != null) {
             // trim namespace down to just the classname

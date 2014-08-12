@@ -1,4 +1,4 @@
-package com.augmate.cycle.ups;
+package com.augmate.counter;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -20,11 +20,16 @@ public class MainActivity extends Activity {
 //        Intent intent = new Intent(this, VoiceCaptorPlaceholder.class);
 //        startActivity(intent);
 
-        // or spawn optical scanner
+        // spawn optical scanner
         Intent intent = new Intent(this, BoxScannerActivity.class);
-        startActivity(intent);
+        startActivityForResult(intent, 0x01);
+    }
 
-        finish();
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if(requestCode == 0x01) {
+            Log.debug("Got resultCode=%d and barcode value=%s", resultCode, data.getExtras().getString("barcodeString"));
+        }
     }
 
     @Override

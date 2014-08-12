@@ -1,4 +1,4 @@
-package com.augmate.cycle.ups;
+package com.augmate.counter;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;

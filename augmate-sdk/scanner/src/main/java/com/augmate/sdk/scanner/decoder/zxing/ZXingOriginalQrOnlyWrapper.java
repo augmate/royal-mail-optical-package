@@ -70,8 +70,11 @@ public class ZXingOriginalQrOnlyWrapper implements IBarcodeScannerWrapper {
 
         } catch (NotFoundException err) {
             // expected failure case when zxing-lib doesn't locate a qr-code. don't log.
+        } catch (ChecksumException err) {
+            // not a problem, just interesting
+            Log.debug("ZXing detected checksum error in QR code");
         } catch (Exception err) {
-            // unexpected failure
+            // unexpected failure. worth noting.
             Log.exception(err, "Error detecting QR code using ZXing");
         }
 

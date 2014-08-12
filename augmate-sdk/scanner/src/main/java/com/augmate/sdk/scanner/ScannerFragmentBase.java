@@ -12,7 +12,6 @@ import com.augmate.sdk.logger.Log;
 import com.augmate.sdk.scanner.decoder.DecodingJob;
 
 public abstract class ScannerFragmentBase extends Fragment implements SurfaceHolder.Callback, Camera.PreviewCallback {
-    int framesSkipped = 0;
     private FramebufferSettings frameBufferSettings = new FramebufferSettings(1280, 720);
     private CameraController cameraController = new CameraController();
     private boolean isProcessingCapturedFrames;
@@ -21,6 +20,7 @@ public abstract class ScannerFragmentBase extends Fragment implements SurfaceHol
     private ScannerVisualDebugger debugger;
     private DecodingThread decodingThread;
     private SurfaceView surfaceView;
+    private int framesSkipped = 0;
 
     /**
      * Must call this method from a place like onCreateView() for the scanner to work
@@ -64,12 +64,6 @@ public abstract class ScannerFragmentBase extends Fragment implements SurfaceHol
 
         // stop decoding thread
         shutdownDecodingThread();
-    }
-
-    public void onScannerSuccess(String data) {
-        if (mListener != null) {
-            mListener.onBarcodeScanSuccess(data);
-        }
     }
 
     @Override
@@ -185,6 +179,10 @@ public abstract class ScannerFragmentBase extends Fragment implements SurfaceHol
             //Log.info("  Found barcode corners: (%d,%d) (%d,%d) (%d,%d)", pts[0].x, pts[0].y, pts[1].x, pts[1].y, pts[2].x, pts[2].y);
             debugger.setPoints(pts);
             debugger.setBarcodeValue(job.result.value);
+
+            if (mListener != null) {
+                mListener.onBarcodeScanSuccess(job.result.value);
+            }
         }
 
         // tell debugger they can use the buffer we wrote decoding debug data to

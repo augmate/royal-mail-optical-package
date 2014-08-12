@@ -1,4 +1,4 @@
-package com.augmate.cycle.ups;
+package com.augmate.counter;
 
 import android.app.Activity;
 import android.content.Context;

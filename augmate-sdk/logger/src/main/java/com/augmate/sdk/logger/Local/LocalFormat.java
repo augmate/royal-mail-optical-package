@@ -1,5 +1,6 @@
-package com.augmate.sdk.logger;
+package com.augmate.sdk.logger.Local;
 
+import com.augmate.sdk.logger.Logentries.LogentriesFormat;
 import org.apache.log4j.Layout;
 import org.apache.log4j.spi.LoggingEvent;
 
@@ -15,7 +16,7 @@ public class LocalFormat extends Layout
     
     @Override
     public String format(LoggingEvent event) {
-        String caller = LogEntriesFormat.getFrame(0);
+        String caller = LogentriesFormat.getFrame(0);
         String thread = Thread.currentThread().getName();
         String formatted = "" + deviceId + " | #" + sessionId + " | " + String.format("%-9s", thread) + " | " + caller + "()";
 
