@@ -6,7 +6,6 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
 import com.augmate.sdk.scanner.ScannerFragmentBase;
-import com.augmate.sdk.scanner.ScannerVisualDebugger;
 
 /**
  * Note about extending ScannerFragmentBase:
@@ -18,10 +17,10 @@ public class ScannerFragment extends ScannerFragmentBase {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.box_scan_fragment, container, false);
 
-        ScannerVisualDebugger dbg = (ScannerVisualDebugger) view.findViewById(R.id.scanner_visual_debugger);
+        //ScannerVisualDebugger dbg = (ScannerVisualDebugger) view.findViewById(R.id.scanner_visual_debugger);
         SurfaceView sv = (SurfaceView) view.findViewById(R.id.camera_preview);
 
-        setupScannerActivity(sv, dbg);
+        setupScannerActivity(sv, null);
 
         return view;
     }

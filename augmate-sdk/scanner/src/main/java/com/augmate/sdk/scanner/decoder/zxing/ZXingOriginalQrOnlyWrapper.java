@@ -10,7 +10,7 @@ import com.google.zxing.common.GlobalHistogramBinarizer;
 import com.google.zxing.qrcode.QRCodeReader;
 
 /**
- * Wrapper around the original untouched open-source yet unsupported ZXing java barcode detector
+ * Wrapper around the original untouched open-source ZXing java barcode detector
  * All benchmarks for ZXing hacks will be compared against this.
  * For speed improvement, we are only handling QR codes here.
  */
@@ -41,7 +41,6 @@ public class ZXingOriginalQrOnlyWrapper implements IBarcodeScannerWrapper {
             // this way we can measure how long this process takes. (it's pretty slow)
             bitmap.getBlackMatrix();
 
-            job.locatingAt = What.timey();
             job.parsingAt = What.timey();
 
             Result result = qrCodeReader.decode(bitmap);

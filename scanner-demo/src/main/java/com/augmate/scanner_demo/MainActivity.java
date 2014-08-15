@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.TextView;
 import com.augmate.sdk.logger.Log;
+import com.augmate.sdk.scanner.decoder.zxing.ZXingMultiDecoderHackWrapper;
 
 public class MainActivity extends Activity {
     public static final int REQUEST_BOX_BARCODE = 0x01;
@@ -18,6 +19,10 @@ public class MainActivity extends Activity {
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON | WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_activity);
+
+        // preallocate buffers, etc
+        // may as well spawn decoding thread now
+        ZXingMultiDecoderHackWrapper.initialize();
     }
 
     @Override

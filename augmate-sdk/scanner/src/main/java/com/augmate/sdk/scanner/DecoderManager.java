@@ -2,7 +2,7 @@ package com.augmate.sdk.scanner;
 
 import com.augmate.sdk.scanner.decoder.DecodingJob;
 import com.augmate.sdk.scanner.decoder.zxing.IBarcodeScannerWrapper;
-import com.augmate.sdk.scanner.decoder.zxing.ZXingOriginalQrOnlyWrapper;
+import com.augmate.sdk.scanner.decoder.zxing.ZXingMultiDecoderHackWrapper;
 
 /**
  * Barcode decoding critical paths start here
@@ -13,8 +13,9 @@ public class DecoderManager {
 
     public DecoderManager() {
         //barcodeScanner = new ZXingHackWrapper(); // java based ZXing with native hacks
-        barcodeScanner = new ZXingOriginalQrOnlyWrapper(); // tried and true completely Java based
+        //barcodeScanner = new ZXingOriginalQrOnlyWrapper(); // tried and true completely Java based
         //barcodeScanner = new ZXingNativeWrapper(); // unsupported native ZXing port that we should fork and publicly contribute to
+        barcodeScanner = new ZXingMultiDecoderHackWrapper();
     }
 
     public void process(DecodingJob job) {

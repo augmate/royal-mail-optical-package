@@ -2,10 +2,8 @@ package com.augmate.sdk.scanner;
 
 import android.graphics.ImageFormat;
 import android.hardware.Camera;
-import android.os.Build;
 import android.view.SurfaceHolder;
 import com.augmate.sdk.logger.Log;
-import com.augmate.sdk.logger.Timer;
 
 import java.io.IOException;
 
@@ -24,25 +22,20 @@ class CameraController {
      * @param surfaceHolder
      */
     public void beginFrameCapture(SurfaceHolder surfaceHolder, Camera.PreviewCallback callback, int width, int height) {
-        assert (surfaceHolder != null);
-        assert (camera == null);
-
         int numOfCameras = Camera.getNumberOfCameras();
-        Log.debug("There are %d cameras available", numOfCameras);
-
-        assert (numOfCameras > 0);
+        //Log.debug("There are %d cameras available", numOfCameras);
 
         int bestCameraIdx = 0;
         Camera.CameraInfo cameraInfo = new Camera.CameraInfo();
         for (int i = 0; i < numOfCameras; i++) {
             Camera.getCameraInfo(i, cameraInfo);
-            Log.debug("  Camera #%d facing=%d orientation=%d", i, cameraInfo.facing, cameraInfo.orientation);
+            //Log.debug("  Camera #%d facing=%d orientation=%d", i, cameraInfo.facing, cameraInfo.orientation);
             if (cameraInfo.facing == Camera.CameraInfo.CAMERA_FACING_BACK) {
                 bestCameraIdx = i;
             }
         }
 
-        Timer cameraTimer = Log.startTimer("Opening camera took %d msec");
+        //Timer cameraTimer = Log.startTimer("Opening camera took %d msec");
 
         // try to open the first available camera
         try {
@@ -60,7 +53,7 @@ class CameraController {
             Log.exception(e, "Failed to open camera interface");
         }
 
-        cameraTimer.stop();
+        //cameraTimer.stop();
 
         Camera.Parameters params = createCameraConfigurationParameters(camera, width, height);
 
@@ -85,7 +78,7 @@ class CameraController {
         }
 
         // zooming is back on Glass after XE16!
-        camera.startSmoothZoom(14);
+        camera.startSmoothZoom(19);
 
         Log.debug("Started camera frame-grabbing.");
     }
@@ -116,15 +109,15 @@ class CameraController {
         // configure camera
         Camera.Parameters params = mCamera.getParameters();
 
-        Log.debug("Hardware build: " + Build.PRODUCT + " / " + Build.DEVICE + " / " + Build.MODEL + " / " + Build.BRAND);
+        //Log.debug("Hardware build: " + Build.PRODUCT + " / " + Build.DEVICE + " / " + Build.MODEL + " / " + Build.BRAND);
 
-        Log.debug("Current camera params: " + params.flatten());
+        //Log.debug("Current camera params: " + params.flatten());
 
         String deviceManufacturerName = params.get("exif-make");
         if (deviceManufacturerName == null)
             deviceManufacturerName = "Unknown";
 
-        Log.debug("  deviceManufacturerName = [" + deviceManufacturerName + "]");
+        //Log.debug("  deviceManufacturerName = [" + deviceManufacturerName + "]");
 
         switch (deviceManufacturerName) {
             case "Vuzix":
@@ -166,6 +159,9 @@ class CameraController {
                 //params.setVideoStabilization(true);
 
                 params.set("iso", 800);
+                //params.setAutoWhiteBalanceLock(false);
+                //params.setAutoExposureLock(false);
+                //params.setFocusMode(Camera.Parameters.FOCUS_MODE_MACRO);
                 params.setSceneMode(Camera.Parameters.SCENE_MODE_BARCODE);
                 params.setPreviewFormat(ImageFormat.NV21);
                 params.setPreviewFpsRange(30000, 30000);

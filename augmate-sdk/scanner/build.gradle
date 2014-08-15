@@ -28,13 +28,10 @@ android {
             String scannerDir = file('.').absolutePath
 
             moduleName "native-scanner"
-            ldLibs "log -lzxing_android_x86_release -L" + scannerDir + "/libs/lib/x86/"
-            cFlags "-fexceptions -I" + scannerDir + "/includes/"
+            //ldLibs "log -lzxing_android_x86_release -L" + scannerDir + "/libs/lib/x86/"
+            //cFlags "-fexceptions -I" + scannerDir + "/includes/"
             stl "gnustl_shared"
-            abiFilter "x86"
-
-            // TODO: play with optimization flags
-            //cFlags "-march=armv7-a -mfloat-abi=softfp -mfpu=neon"
+            abiFilters "x86", "armeabi-v7a"
         }
     }
 
@@ -69,8 +66,25 @@ android {
     lintOptions {
         abortOnError false
     }
-    productFlavors {
-    }
+
+//    productFlavors {
+//        x86 {
+//            ndk {
+//                abiFilters "x86"
+//            }
+//            versionCode = 2
+//            packageName defaultConfig.packageName + ".x86"
+//        }
+//
+//        arm {
+//            ndk {
+//                abiFilters "armeabi-v7a"
+//                cFlags "-march=armv7-a -mfloat-abi=softfp -mfpu=neon"
+//            }
+//            versionCode = 1
+//            packageName defaultConfig.packageName + ".arm"
+//        }
+//    }
 }
 
 task javah {

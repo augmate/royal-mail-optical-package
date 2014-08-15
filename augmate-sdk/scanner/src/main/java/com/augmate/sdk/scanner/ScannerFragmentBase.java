@@ -12,7 +12,7 @@ import com.augmate.sdk.logger.Log;
 import com.augmate.sdk.scanner.decoder.DecodingJob;
 
 public abstract class ScannerFragmentBase extends Fragment implements SurfaceHolder.Callback, Camera.PreviewCallback {
-    private FramebufferSettings frameBufferSettings = new FramebufferSettings(1280, 720);
+    private FramebufferSettings frameBufferSettings = new FramebufferSettings(1024, 576);
     private CameraController cameraController = new CameraController();
     private boolean isProcessingCapturedFrames;
     private OnScannerResultListener mListener;
@@ -118,14 +118,11 @@ public abstract class ScannerFragmentBase extends Fragment implements SurfaceHol
 
     @Override
     public void surfaceCreated(SurfaceHolder surfaceHolder) {
-        Log.debug("Surface has been created");
-        Log.debug("  Surface has size of %d x %d", surfaceHolder.getSurfaceFrame().width(), surfaceHolder.getSurfaceFrame().height());
     }
 
     @Override
     public void surfaceChanged(SurfaceHolder surfaceHolder, int i, int i2, int i3) {
-        Log.debug("Surface has changed");
-        Log.debug("  Surface has size of %d x %d", surfaceHolder.getSurfaceFrame().width(), surfaceHolder.getSurfaceFrame().height());
+        Log.debug("Surface has size of %d x %d", surfaceHolder.getSurfaceFrame().width(), surfaceHolder.getSurfaceFrame().height());
 
         // configure debugging render-target
         if (dbgVisualizer != null)

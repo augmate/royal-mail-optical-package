@@ -30,8 +30,6 @@ public class ZXingHackWrapper implements IBarcodeScannerWrapper {
         NativeUtils.binarize(data, binaryMatrix, width, height);
         //NativeUtils.binarizeToIntBuffer(data, job.getDebugOutputBuffer(), width, height);
 
-        job.locatingAt = What.timey();
-
         // give ZXing a try
         PatternFinder finder = new PatternFinder(binaryMatrix, width, height);
 

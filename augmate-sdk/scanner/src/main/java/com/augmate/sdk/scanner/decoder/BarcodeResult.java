@@ -23,6 +23,9 @@ public class BarcodeResult {
     public Format format = Format.UNKNOWN;
 
     public void setDirectly(Point pt1, Point pt2, Point pt3, Point pt4) {
+        if (pt1 == null || pt2 == null || pt3 == null || pt4 == null)
+            return;
+
         corners[0] = pt1;
         corners[1] = pt2;
         corners[2] = pt3;

@@ -15,7 +15,6 @@ public class DecodingJob {
     // TODO: this should be decoder-specific (zxing is more transparent than scandit)
     public long decodeStartedAt;
     public long binarizationAt;
-    public long locatingAt;
     public long parsingAt;
     public long decodeCompletedAt;
 
@@ -30,7 +29,7 @@ public class DecodingJob {
     }
 
     public long binarizationDuration() {
-        return locatingAt - binarizationAt;
+        return decodeCompletedAt - binarizationAt;
     }
 
     public long totalDuration() {
@@ -55,9 +54,5 @@ public class DecodingJob {
 
     public int[] getDebugOutputBuffer() {
         return debugOutputBuffer;
-    }
-
-    public long localizationDuration() {
-        return parsingAt - locatingAt;
     }
 }
