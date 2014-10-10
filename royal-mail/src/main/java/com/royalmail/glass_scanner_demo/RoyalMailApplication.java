@@ -1,8 +1,8 @@
-package com.augmate.scanner_demo;
+package com.royalmail.glass_scanner_demo;
 
 import com.augmate.sdk.logger.Log;
 
-public class DemoApplication extends android.app.Application {
+public class RoyalMailApplication extends android.app.Application {
     @Override
     public void onCreate() {
         super.onCreate();

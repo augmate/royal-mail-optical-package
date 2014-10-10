@@ -38,7 +38,7 @@ public class SimpleBinarizer extends Binarizer {
         }
     }
 
-    // Alex: modified to use a native estimator
+    // modified to use a native estimator
     // Applies simple sharpening to the row data to improve performance of the 1D Readers.
     @Override
     public BitArray getBlackRow(int y, BitArray row) throws NotFoundException {
@@ -54,8 +54,6 @@ public class SimpleBinarizer extends Binarizer {
             getBlackRowBuffer = new byte[width];
         }
 
-        //Log.debug("using getBlackRow() with native-optimized black-point estimator");
-
         byte[] localLuminances = source.getRow(y, getBlackRowBuffer);
 
         for(int x = 0; x < LUMINANCE_BUCKETS; x ++) {
@@ -67,8 +65,6 @@ public class SimpleBinarizer extends Binarizer {
         }
 
         int blackPoint = NativeUtils.estimateBlackPoint(blackRowBucketsBuffer, blackRowBucketsBuffer.length);
-
-        //Log.debug("native black-point estimate: %d", blackPoint);
 
         int left = localLuminances[0] & 0xff;
         int center = localLuminances[1] & 0xff;
@@ -86,7 +82,7 @@ public class SimpleBinarizer extends Binarizer {
     }
 
 
-    // Alex: modified to run entirely native
+    // modified to run entirely native (in c)
     @Override
     public BitMatrix getBlackMatrix() throws NotFoundException {
         LuminanceSource source = getLuminanceSource();
@@ -99,8 +95,6 @@ public class SimpleBinarizer extends Binarizer {
             Log.error("Sanity failure: packed bit matrix is NULL. Cannot perform binarization.");
             return packedBitMatrix;
         }
-
-        //Log.debug("using getBlackMatrix() that's entirely native-optimized");
 
         Arrays.fill(packedBitMatrixBuffer, 0);
 

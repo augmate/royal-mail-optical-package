@@ -17,13 +17,6 @@ import java.util.HashMap;
 public class ZXingMultiDecoderHackWrapper implements IBarcodeScannerWrapper {
     protected BitMatrix binarizedBuffer = new BitMatrix(1024, 576);
 
-    /**
-     * Run this on app start to preallocate necessary buffers before scan is requested
-     */
-    public static void initialize() {
-        Log.debug("Preloading..");
-    }
-
 
     @Override
     public void process(DecodingJob job) {

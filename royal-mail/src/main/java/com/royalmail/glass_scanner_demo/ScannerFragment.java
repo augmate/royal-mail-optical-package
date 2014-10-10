@@ -1,10 +1,11 @@
-package com.augmate.scanner_demo;
+package com.royalmail.glass_scanner_demo;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
+import com.augmate.scanner_demo.R;
 import com.augmate.sdk.scanner.ScannerFragmentBase;
 
 /**
@@ -18,7 +19,7 @@ public class ScannerFragment extends ScannerFragmentBase {
         View view = inflater.inflate(R.layout.box_scan_fragment, container, false);
 
         //ScannerVisualDebugger dbg = (ScannerVisualDebugger) view.findViewById(R.id.scanner_visual_debugger);
-        SurfaceView sv = (SurfaceView) view.findViewById(R.id.camera_preview);
+        SurfaceView sv = (SurfaceView) view.findViewById(R.id.scanner_camera_view);
 
         setupScannerActivity(sv, null);
 

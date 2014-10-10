@@ -1,1 +1,6 @@
-include ':scanner-demo', ':augmate-sdk:scanner', ':augmate-sdk:logger'
+// sdk
+include ':augmate-sdk:scanner',
+        ':augmate-sdk:logger'
+
+// app
+include ':royal-mail'

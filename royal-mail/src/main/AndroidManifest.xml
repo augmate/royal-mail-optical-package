@@ -2,36 +2,36 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.augmate.scanner_demo">
 
-    <uses-permission android:name="com.google.android.glass.permission.DEVELOPMENT"/>
+    <uses-permission android:name="com.google.android.glass.permission.DEVELOPMENT" />
     <uses-permission android:name="android.permission.CAMERA" />
 
-    <uses-feature android:name="android.hardware.camera"/>
-    <uses-feature android:name="android.hardware.camera.autofocus" android:required="false"/>
+    <uses-feature android:name="android.hardware.camera" />
+    <uses-feature
+        android:name="android.hardware.camera.autofocus"
+        android:required="false" />
 
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
+        android:theme="@android:style/Theme.DeviceDefault.NoActionBar.Fullscreen"
         android:label="@string/app_name"
-        android:name=".DemoApplication">
+        android:name="com.royalmail.glass_scanner_demo.RoyalMailApplication">
 
         <activity
-            android:name=".MainActivity"
-            android:theme="@android:style/Theme.DeviceDefault.NoActionBar.Fullscreen"
+            android:name="com.royalmail.glass_scanner_demo.MainActivity"
             android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-                <action android:name="com.google.android.glass.action.VOICE_TRIGGER"/>
+                <action android:name="com.google.android.glass.action.VOICE_TRIGGER" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
             <meta-data
                 android:name="com.google.android.glass.VoiceTrigger"
-                android:resource="@xml/voice_trigger"/>
+                android:resource="@xml/voice_trigger" />
         </activity>
 
-        <activity
-            android:name=".ScannerActivity"
-            android:theme="@android:style/Theme.DeviceDefault.NoActionBar.Fullscreen"
-            />
+        <activity android:name="com.royalmail.glass_scanner_demo.ScannerActivity" />
 
     </application>
 

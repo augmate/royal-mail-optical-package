@@ -1,12 +1,13 @@
-package com.augmate.scanner_demo;
+package com.royalmail.glass_scanner_demo;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
+import com.augmate.scanner_demo.R;
 import com.augmate.sdk.logger.Log;
 import com.augmate.sdk.scanner.ScannerFragmentBase;
 
-public class ScannerActivity extends FragmentActivity implements ScannerFragmentBase.OnScannerResultListener {
+public class ScannerActivity extends Activity implements ScannerFragmentBase.OnScannerResultListener {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

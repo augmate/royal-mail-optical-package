@@ -13,7 +13,7 @@
     -->
     <fragment
         android:id="@+id/scanner"
-        android:name="com.augmate.scanner_demo.ScannerFragment"
+        android:name="com.royalmail.glass_scanner_demo.ScannerFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 

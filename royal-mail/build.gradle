@@ -16,10 +16,10 @@ android {
     compileSdkVersion 'Google Inc.:Glass Development Kit Preview:19'
     buildToolsVersion '20.0.0'
 
-    // to make gradle 0.12 happy
+    // temporary fix for gradle 0.12 support
     useOldManifestMerger true
 
-    // log4j is causing a LOT of lint errors :(
+    // FIXME: log4j is causing a LOT of lint errors. replace it with a lighter logger.
     lintOptions {
         abortOnError false
     }
@@ -52,8 +52,6 @@ android {
         exclude 'LICENSE.txt'
         exclude 'META-INF/LICENSE.txt'
         exclude 'META-INF/NOTICE.txt'
-    }
-    productFlavors {
     }
 }
 

@@ -57,7 +57,7 @@ public class Log {
         /* FIXME: LogEntries library needs to be updated
         // remote output
         LogentriesAppender logentriesAppender = new LogentriesAppender();
-        logentriesAppender.setToken("c3a45763-9854-43cc-838a-7a1b71418c6c");
+        logentriesAppender.setToken(YOUR-TOKEN-HERE);
         logentriesAppender.setDebug(true);
         logentriesAppender.setLayout(new LogentriesFormat(sessionId, deviceId));
         logentriesAppender.setSsl(false);
