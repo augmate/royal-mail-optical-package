@@ -1,0 +1,20 @@
+We use the following 3rd party software libraries:
+
+  * ZXing
+    - Description: industry standard open-source 1D + 2D barcode scanner
+    - License: Apache v2 (http://www.apache.org/licenses/LICENSE-2.0.html)
+  * Robolectric
+    - Description: unit-testing framework for Android
+    - License: MIT License (https://github.com/robolectric/robolectric/blob/master/LICENSE.txt)
+  * JUnit
+    - Description: unit-testing framework for Java
+    - License: Eclipse Public License v1 (http://junit.org/license.html)
+  * AssertJ
+    - Description: fluent assertions for unit-testing Java via JUnit
+    - License: Apache v2 (http://www.apache.org/licenses/LICENSE-2.0.html)
+  * Joda Time
+    - Description: quality date and time calendar functions for Java
+    - License: Apache v2 (http://www.apache.org/licenses/LICENSE-2.0.html)
+  * Log4j
+    - Description: logging framework for Java
+    - License: Apache v2 (http://www.apache.org/licenses/LICENSE-2.0.html)

@@ -6,20 +6,18 @@ import android.provider.Settings;
 import com.augmate.sdk.logger.Local.LocalAppender;
 import com.augmate.sdk.logger.Local.LocalFormat;
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
 /**
  * Log wraps multiple logger systems into one neat package.
  * Currently it supports:
- * + Logentries integration
  * + Standard LogCat compatible dbg-output
  *
  * It comes with a custom PatternLayout that resolves "class::method()"
  * faster than LocationPatternConverter and lets us control amount of frames
  * popped off the stack to identify the exact caller we care about.
  *
- * Current we build on log4j. But eventually will move to a lighter, faster, and more lint-friendly logger
+ * Current we build on top of log4j. But eventually will move to a lighter, faster, and more lint-friendly logger
  */
 public class Log {
     private static Logger loggerInstance;
@@ -42,26 +40,10 @@ public class Log {
         }
     }
 
-    /**
-     * Must be called on application shutdown to clean-up socket-based loggers (eg: LogEntries)
-     */
-    public static void shutdown() {
-        LogManager.shutdown();
-    }
-
     private static Logger createInstance(String deviceId) {
 
         // not super random or collision free, but good enough for quick grouping/filtering of logs by unique runs
         String sessionId = Long.toString(Math.abs(java.util.UUID.randomUUID().getLeastSignificantBits()), 36).substring(0, 6);
-
-        /* FIXME: LogEntries library needs to be updated
-        // remote output
-        LogentriesAppender logentriesAppender = new LogentriesAppender();
-        logentriesAppender.setToken(YOUR-TOKEN-HERE);
-        logentriesAppender.setDebug(true);
-        logentriesAppender.setLayout(new LogentriesFormat(sessionId, deviceId));
-        logentriesAppender.setSsl(false);
-        */
 
         // local output
         LocalAppender localAppender = new LocalAppender();

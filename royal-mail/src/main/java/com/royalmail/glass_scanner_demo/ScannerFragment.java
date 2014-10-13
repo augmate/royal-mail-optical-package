@@ -17,12 +17,9 @@ public class ScannerFragment extends ScannerFragmentBase {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.box_scan_fragment, container, false);
-
         //ScannerVisualDebugger dbg = (ScannerVisualDebugger) view.findViewById(R.id.scanner_visual_debugger);
         SurfaceView sv = (SurfaceView) view.findViewById(R.id.scanner_camera_view);
-
         setupScannerActivity(sv, null);
-
         return view;
     }
 }
