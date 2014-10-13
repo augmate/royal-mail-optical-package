@@ -1,3 +1,6 @@
+/*
+ * this uses the native-c++ zxing. not enabled at the moment.
+ */
 #if 0
 #include <stdio.h>
 #include "Helpers.h"

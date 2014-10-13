@@ -19,7 +19,7 @@ android {
     // temporary fix for gradle 0.12 support
     useOldManifestMerger true
 
-    // FIXME: log4j is causing a LOT of lint errors. replace it with a lighter logger.
+    // log4j is causing a LOT of lint errors. replace it with a lighter logger.
     lintOptions {
         abortOnError false
     }
