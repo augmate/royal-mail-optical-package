@@ -5,11 +5,12 @@ Royal Mail Demo + Augmate SDK is a Google Glass optimized optical bar-code scann
 This was created to help internal R&D departments experiment with new ideas.  
 
 ## Dependencies
-1) [Standalone Android SDK Tools](https://developer.android.com/sdk/index.html) is available under the heading "Get SDK for an existing IDE"
+* [Standalone Android SDK Tools](https://developer.android.com/sdk/index.html) is available under the heading "Get SDK for an existing IDE"  
   Mixing IntelliJ with the Eclipse ADT Bundle is possible, but may require extra work.  
-2) [32-bit Android NDK](https://developer.android.com/tools/sdk/ndk/index.html)  
-3) [Latest version of IntelliJ on JetBrains' EAP page](https://confluence.jetbrains.com/display/IDEADEV/IDEA+14+EAP).
+* [32-bit Android NDK](https://developer.android.com/tools/sdk/ndk/index.html)  
+* [Latest version of IntelliJ on JetBrains' EAP page](https://confluence.jetbrains.com/display/IDEADEV/IDEA+14+EAP).  
 The Community Edition works if you don't yet have a paid license for this amazing IDE.
+
 ## Getting Started
 
 Install:  
@@ -24,13 +25,13 @@ ndk.dir=/absolute/path/android-ndk
 sdk.dir=/absolute/path/android-sdk
 ```
 
-Build from source the console way: (skips optimization and linting)  
+Build from source the quick console way:  
 ```shell
 ./gradlew build -x preDexDebug -x preDexRelease -x lint
 ```
 
 Install Royal Mail apk onto your Glass:  
-Generated apks end up in: `royal-mail/build/outputs/apk/`  
+Generated apks are found in: `royal-mail/build/outputs/apk/`  
 ```shell
 adb install royal-mail/build/outputs/apk/royal-mail-release.apk
 ```
